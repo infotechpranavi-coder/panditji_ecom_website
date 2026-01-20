@@ -8,8 +8,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Divya Puja - Sacred Temple Services',
-  description: 'Traditional Indian temple services, pujas, and spiritual offerings online',
+  title: 'Book My Panditji - Book Puja Services Online',
+  description: 'Book authentic Indian traditional puja services, festivals puja, yagnas, homas, and dosha nivaran online. Connect with certified priests for your spiritual needs.',
   generator: 'v0.app',
   icons: {
     icon: [

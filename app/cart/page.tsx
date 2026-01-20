@@ -83,64 +83,73 @@ export default function CartPage() {
       </div>
 
       {/* Main Content */}
-      <section className="flex-1 px-4 py-12">
+      <section className="flex-1 px-4 py-12 gradient-section-1">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+          <div className="mb-8">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Shopping Cart
+            </h1>
+            <p className="text-muted-foreground">Review your selected services</p>
+          </div>
 
           {cartItems.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">🛒</div>
-              <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-              <p className="text-muted-foreground mb-8">
+            <div className="text-center py-20">
+              <div className="text-8xl mb-6 animate-bounce">🛒</div>
+              <h2 className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Your cart is empty
+              </h2>
+              <p className="text-lg text-muted-foreground mb-10 max-w-md mx-auto">
                 Start adding services to book your spiritual experience
               </p>
               <Link
                 href="/services"
-                className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition inline-flex items-center gap-2"
+                className="px-10 py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2 shadow-lg"
               >
-                Browse Services <ArrowRight className="w-4 h-4" />
+                Browse Services <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               {/* Cart Items */}
               <div className="lg:col-span-2">
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="bg-card rounded-lg border border-border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-2">{item.name}</h3>
-                        <p className="text-muted-foreground">₹{item.price} per service</p>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3 border border-border rounded-lg p-2">
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-2 py-1 hover:bg-muted rounded transition"
-                          >
-                            −
-                          </button>
-                          <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-2 py-1 hover:bg-muted rounded transition"
-                          >
-                            +
-                          </button>
+                    <div key={item.id} className="bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl border border-border/50 p-6 card-elevated hover:border-primary/50 transition-all">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-xl mb-2 group-hover:text-primary transition-colors">{item.name}</h3>
+                          <p className="text-muted-foreground">₹{item.price} per service</p>
                         </div>
 
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Subtotal</p>
-                          <p className="text-xl font-bold text-primary">₹{item.price * item.quantity}</p>
-                        </div>
+                        <div className="flex items-center gap-6">
+                          <div className="flex items-center gap-3 border-2 border-border rounded-xl p-2 bg-background">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="px-3 py-1 hover:bg-primary/10 hover:text-primary rounded-lg transition font-bold text-lg"
+                            >
+                              −
+                            </button>
+                            <span className="w-10 text-center font-bold text-lg">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="px-3 py-1 hover:bg-primary/10 hover:text-primary rounded-lg transition font-bold text-lg"
+                            >
+                              +
+                            </button>
+                          </div>
 
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition ml-4"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                          <div className="text-right min-w-[100px]">
+                            <p className="text-sm text-muted-foreground mb-1">Subtotal</p>
+                            <p className="text-2xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">₹{item.price * item.quantity}</p>
+                          </div>
+
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            className="p-3 text-destructive hover:bg-destructive/10 rounded-xl transition hover:scale-110"
+                          >
+                            <Trash2 className="w-6 h-6" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -149,46 +158,54 @@ export default function CartPage() {
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
-                <div className="sticky top-20 bg-card rounded-lg border border-border p-8">
-                  <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+                <div className="sticky top-20 bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl border border-border/50 p-8 card-elevated">
+                  <h2 className="text-2xl font-extrabold mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Order Summary
+                  </h2>
 
-                  <div className="space-y-4 mb-6 pb-6 border-b border-border">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-semibold">₹{subtotal}</span>
+                  <div className="space-y-4 mb-8 pb-6 border-b border-border/50">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-medium">Subtotal</span>
+                      <span className="font-bold text-lg">₹{subtotal}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Tax (5%)</span>
-                      <span className="font-semibold">₹{tax.toFixed(2)}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-medium">Tax (5%)</span>
+                      <span className="font-bold text-lg">₹{tax.toFixed(2)}</span>
                     </div>
                   </div>
 
-                  <div className="mb-6">
+                  <div className="mb-8 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-lg font-bold">Total</span>
-                      <span className="text-2xl font-bold text-primary">₹{total.toFixed(2)}</span>
+                      <span className="text-xl font-bold">Total</span>
+                      <span className="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">Including all taxes</p>
                   </div>
 
                   <Link
                     href="/checkout"
-                    className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition text-center block mb-3"
+                    className="w-full px-6 py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 text-center block mb-4 shadow-lg"
                   >
                     Proceed to Checkout
                   </Link>
 
                   <Link
                     href="/services"
-                    className="w-full px-6 py-3 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition text-center block"
+                    className="w-full px-6 py-4 border-2 border-primary text-primary rounded-xl font-bold hover:bg-primary/10 transition-all duration-300 text-center block"
                   >
                     Continue Shopping
                   </Link>
 
-                  <div className="mt-6 pt-6 border-t border-border space-y-2 text-xs text-muted-foreground">
-                    <p>✓ Secure checkout</p>
-                    <p>✓ Expert service delivery</p>
-                    <p>✓ Money-back guarantee</p>
+                  <div className="mt-8 pt-6 border-t border-border/50 space-y-3 text-sm">
+                    <p className="flex items-center gap-2 text-muted-foreground">
+                      <span className="text-primary">✓</span> Secure checkout
+                    </p>
+                    <p className="flex items-center gap-2 text-muted-foreground">
+                      <span className="text-primary">✓</span> Expert service delivery
+                    </p>
+                    <p className="flex items-center gap-2 text-muted-foreground">
+                      <span className="text-primary">✓</span> Money-back guarantee
+                    </p>
                   </div>
                 </div>
               </div>

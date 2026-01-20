@@ -47,7 +47,7 @@ export default function CheckoutPage() {
     // Simulate order placement
     setOrderPlaced(true)
     localStorage.setItem('cart', JSON.stringify([]))
-    
+
     // Update cart count
     const cartCount = document.getElementById('cart-count')
     if (cartCount) {
@@ -79,21 +79,31 @@ export default function CheckoutPage() {
         <Navbar />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="text-center max-w-md">
-            <div className="mb-6 flex justify-center">
-              <CheckCircle2 className="w-20 h-20 text-primary animate-bounce" />
+            <div className="mb-8 flex justify-center">
+              <div className="p-6 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full">
+                <CheckCircle2 className="w-24 h-24 text-primary animate-bounce" />
+              </div>
             </div>
-            <h1 className="text-3xl font-bold mb-4">Order Confirmed! 🙏</h1>
-            <p className="text-muted-foreground mb-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Order Confirmed! 🙏
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
               Thank you for booking our services. We will contact you shortly to confirm the date and time of your service.
             </p>
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-8">
-              <p className="text-sm mb-2">Order ID: <span className="font-bold">#DP{Math.floor(Math.random() * 100000)}</span></p>
-              <p className="text-sm mb-2">Amount: <span className="font-bold text-primary">₹{total.toFixed(2)}</span></p>
-              <p className="text-sm">Status: <span className="font-bold text-primary">Confirmed</span></p>
+            <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border-2 border-primary/30 rounded-2xl p-6 mb-10 card-elevated">
+              <p className="text-base mb-3">
+                Order ID: <span className="font-bold text-primary">#DP{Math.floor(Math.random() * 100000)}</span>
+              </p>
+              <p className="text-base mb-3">
+                Amount: <span className="font-bold text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
+              </p>
+              <p className="text-base">
+                Status: <span className="font-bold text-primary text-lg">Confirmed</span>
+              </p>
             </div>
             <Link
               href="/"
-              className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition inline-block"
+              className="px-10 py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-block shadow-lg"
             >
               Return Home
             </Link>
@@ -139,15 +149,22 @@ export default function CheckoutPage() {
       </div>
 
       {/* Main Content */}
-      <section className="flex-1 px-4 py-12">
+      <section className="flex-1 px-4 py-12 gradient-section-1">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-4xl font-bold mb-8">Checkout</h1>
+          <div className="mb-8">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Checkout
+            </h1>
+            <p className="text-muted-foreground">Complete your booking information</p>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Checkout Form */}
             <form onSubmit={handleSubmit} className="lg:col-span-2">
-              <div className="bg-card rounded-lg border border-border p-8 mb-8">
-                <h2 className="text-2xl font-bold mb-6">Booking Information</h2>
+              <div className="bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl border border-border/50 p-8 mb-8 card-elevated">
+                <h2 className="text-2xl font-extrabold mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Booking Information
+                </h2>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
@@ -186,7 +203,7 @@ export default function CheckoutPage() {
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                      placeholder="john@example.com"
+                      placeholder="info@bookmypanditji.com"
                     />
                   </div>
                   <div>
@@ -269,27 +286,29 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Section */}
-              <div className="bg-card rounded-lg border border-border p-8 mb-8">
-                <h2 className="text-2xl font-bold mb-6">Payment Method</h2>
-                <div className="space-y-3">
-                  <label className="flex items-center p-4 border border-primary rounded-lg bg-primary/5 cursor-pointer">
-                    <input type="radio" name="payment" value="card" defaultChecked className="mr-3" />
-                    <span className="font-medium">Credit/Debit Card</span>
+              <div className="bg-gradient-to-br from-card via-card to-accent/5 rounded-2xl border border-border/50 p-8 mb-8 card-elevated">
+                <h2 className="text-2xl font-extrabold mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Payment Method
+                </h2>
+                <div className="space-y-4">
+                  <label className="flex items-center p-5 border-2 border-primary rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 cursor-pointer hover:shadow-lg transition-all">
+                    <input type="radio" name="payment" value="card" defaultChecked className="mr-4 w-5 h-5" />
+                    <span className="font-bold text-lg">Credit/Debit Card</span>
                   </label>
-                  <label className="flex items-center p-4 border border-border rounded-lg hover:border-primary/50 cursor-pointer transition">
-                    <input type="radio" name="payment" value="upi" className="mr-3" />
-                    <span className="font-medium">UPI</span>
+                  <label className="flex items-center p-5 border-2 border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
+                    <input type="radio" name="payment" value="upi" className="mr-4 w-5 h-5" />
+                    <span className="font-bold text-lg">UPI</span>
                   </label>
-                  <label className="flex items-center p-4 border border-border rounded-lg hover:border-primary/50 cursor-pointer transition">
-                    <input type="radio" name="payment" value="bank" className="mr-3" />
-                    <span className="font-medium">Bank Transfer</span>
+                  <label className="flex items-center p-5 border-2 border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all">
+                    <input type="radio" name="payment" value="bank" className="mr-4 w-5 h-5" />
+                    <span className="font-bold text-lg">Bank Transfer</span>
                   </label>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full px-8 py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 transition"
+                className="w-full px-8 py-5 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 shadow-lg"
               >
                 Place Order & Pay
               </button>
@@ -297,8 +316,10 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="sticky top-20 bg-card rounded-lg border border-border p-8">
-                <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+              <div className="sticky top-20 bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl border border-border/50 p-8 card-elevated">
+                <h2 className="text-2xl font-extrabold mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Order Summary
+                </h2>
 
                 <div className="space-y-4 mb-6 pb-6 border-b border-border max-h-96 overflow-y-auto">
                   {cartItems.map((item) => (
@@ -323,17 +344,25 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="border-t border-border pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold">Total Amount</span>
-                    <span className="text-2xl font-bold text-primary">₹{total.toFixed(2)}</span>
+                <div className="border-t border-border/50 pt-6 mt-6">
+                  <div className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20 mb-6">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-xl">Total Amount</span>
+                      <span className="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">₹{total.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <p className="text-xs text-muted-foreground mb-2">✓ Secure payment</p>
-                  <p className="text-xs text-muted-foreground mb-2">✓ 100% authentic rituals</p>
-                  <p className="text-xs text-muted-foreground">✓ Satisfaction guaranteed</p>
+                <div className="mt-6 p-5 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl border border-primary/20">
+                  <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                    <span className="text-primary font-bold">✓</span> Secure payment
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                    <span className="text-primary font-bold">✓</span> 100% authentic rituals
+                  </p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <span className="text-primary font-bold">✓</span> Satisfaction guaranteed
+                  </p>
                 </div>
               </div>
             </div>
