@@ -1,4 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
+
+const STORAGE_FILE = path.join(process.cwd(), 'data', 'pujas.json')
+
+function getPujasFromStorage(): any[] {
+  try {
+    if (fs.existsSync(STORAGE_FILE)) {
+      const data = fs.readFileSync(STORAGE_FILE, 'utf-8')
+      return JSON.parse(data)
+    }
+  } catch (error) {
+    console.error('Error reading pujas from storage:', error)
+  }
+  return []
+}
+
+function savePujasToStorage(pujas: any[]): void {
+  try {
+    const dataDir = path.dirname(STORAGE_FILE)
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true })
+    }
+    fs.writeFileSync(STORAGE_FILE, JSON.stringify(pujas, null, 2))
+  } catch (error) {
+    console.error('Error saving pujas to storage:', error)
+    throw error
+  }
+}
 
 export async function DELETE(
   request: NextRequest,
@@ -10,6 +39,10 @@ export async function DELETE(
     // TODO: Replace with actual database delete
     // Example with MongoDB:
     // const result = await db.collection('pujas').deleteOne({ _id: new ObjectId(id) })
+    
+    const pujas = getPujasFromStorage()
+    const filtered = pujas.filter((p: any) => p.id !== id)
+    savePujasToStorage(filtered)
     
     return NextResponse.json({ message: 'Puja deleted successfully' })
   } catch (error) {

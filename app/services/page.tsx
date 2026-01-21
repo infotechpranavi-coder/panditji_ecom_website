@@ -4,87 +4,134 @@ import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { ChevronRight, ArrowRight, Flame, Focus as Lotus, BookOpen, Sparkles, Gift, Calendar } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 
-const allServices = [
-  {
-    id: 1,
-    category: 'Daily Rituals',
-    name: 'Daily Puja Ritual',
-    price: 499,
-    description: 'Traditional daily puja performed by certified priests',
-    duration: '45 mins',
-    icon: Flame,
-  },
-  {
-    id: 2,
-    category: 'Offerings',
-    name: 'Abhisheka Service',
-    price: 799,
-    description: 'Sacred offering with sacred water and flowers',
-    duration: '1 hour',
-    icon: Lotus,
-  },
-  {
-    id: 3,
-    category: 'Consultations',
-    name: 'Vedic Consultation',
-    price: 1999,
-    description: 'Personal guidance from experienced vedic scholars',
-    duration: '1 hour',
-    icon: BookOpen,
-  },
-  {
-    id: 4,
-    category: 'Special Rituals',
-    name: 'Special Havan',
-    price: 1499,
-    description: 'Fire ritual for prosperity and peace',
-    duration: '2 hours',
-    icon: Sparkles,
-  },
-  {
-    id: 5,
-    category: 'Offerings',
-    name: 'Festival Offerings',
-    price: 699,
-    description: 'Complete offerings for festivals and celebrations',
-    duration: '1.5 hours',
-    icon: Gift,
-  },
-  {
-    id: 6,
-    category: 'Planning',
-    name: 'Event Planning & Ritual',
-    price: 2499,
-    description: 'Complete planning and execution of major rituals',
-    duration: 'Custom',
-    icon: Calendar,
-  },
-  {
-    id: 7,
-    category: 'Daily Rituals',
-    name: 'Morning Aarti',
-    price: 299,
-    description: 'Traditional morning worship and light ceremony',
-    duration: '30 mins',
-    icon: Flame,
-  },
-  {
-    id: 8,
-    category: 'Consultations',
-    name: 'Astrology Reading',
-    price: 1299,
-    description: 'Detailed birth chart analysis and guidance',
-    duration: '45 mins',
-    icon: BookOpen,
-  },
-]
-
-const categories = ['All', 'Daily Rituals', 'Offerings', 'Consultations', 'Special Rituals', 'Planning']
+// Icon mapping for services
+const iconMap: Record<string, any> = {
+  'Daily Rituals': Flame,
+  'Offerings': Lotus,
+  'Consultations': BookOpen,
+  'Special Rituals': Sparkles,
+  'Planning': Calendar,
+}
 
 export default function ServicesPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [categories, setCategories] = useState<string[]>(['All'])
+  const [allServices, setAllServices] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [loading, setLoading] = useState(true)
+
+  // Map category names to URL slugs
+  const categoryToSlug = (categoryName: string): string => {
+    const slugMap: Record<string, string> = {
+      'Pujas & Vrat': 'pujas-vrat',
+      'Yagnas / Homas': 'yagnas-homas',
+      'Dosha Nivaran': 'dosha-nivaran',
+      'Daily Rituals': 'daily-rituals',
+      'Offerings': 'offerings',
+      'Consultations': 'consultations',
+      'Special Rituals': 'special-rituals',
+      'Planning': 'planning',
+    }
+    return slugMap[categoryName] || categoryName.toLowerCase().replace(/\s+/g, '-')
+  }
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+    if (category === 'All') {
+      router.push('/services')
+    } else {
+      const slug = categoryToSlug(category)
+      router.push(`/services?category=${slug}`)
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+    fetchServices()
+  }, [])
+
+  useEffect(() => {
+    // Read category from URL query parameter
+    const categoryParam = searchParams.get('category')
+    if (categoryParam) {
+      // Map URL slugs to category names
+      const categoryMap: Record<string, string> = {
+        'pujas-vrat': 'Pujas & Vrat',
+        'yagnas-homas': 'Yagnas / Homas',
+        'dosha-nivaran': 'Dosha Nivaran',
+        'daily-rituals': 'Daily Rituals',
+        'offerings': 'Offerings',
+        'consultations': 'Consultations',
+        'special-rituals': 'Special Rituals',
+        'planning': 'Planning',
+      }
+      const categoryName = categoryMap[categoryParam] || categoryParam
+      setSelectedCategory(categoryName)
+    }
+  }, [searchParams])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        const categoryNames = ['All', ...data.map((cat: any) => cat.name)]
+        setCategories(categoryNames)
+        
+        // If category is set from URL, ensure it exists in categories
+        const categoryParam = searchParams.get('category')
+        if (categoryParam) {
+          const categoryMap: Record<string, string> = {
+            'pujas-vrat': 'Pujas & Vrat',
+            'yagnas-homas': 'Yagnas / Homas',
+            'dosha-nivaran': 'Dosha Nivaran',
+            'daily-rituals': 'Daily Rituals',
+            'offerings': 'Offerings',
+            'consultations': 'Consultations',
+            'special-rituals': 'Special Rituals',
+            'planning': 'Planning',
+          }
+          const categoryName = categoryMap[categoryParam] || categoryParam
+          // Check if category exists in fetched categories, or use the mapped name
+          if (categoryNames.includes(categoryName) || categoryMap[categoryParam]) {
+            setSelectedCategory(categoryName)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch('/api/pujas')
+      if (response.ok) {
+        const data = await response.json()
+        // Map pujas to services format with icons
+        const services = data.map((puja: any) => ({
+          id: puja.id,
+          category: puja.category,
+          name: puja.name,
+          price: puja.price,
+          description: puja.shortDescription || puja.description || '',
+          duration: puja.duration || 'N/A',
+          icon: iconMap[puja.category] || Gift,
+        }))
+        setAllServices(services)
+      } else {
+        console.error('Failed to fetch services:', response.statusText)
+      }
+    } catch (error) {
+      console.error('Error fetching services:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredServices = selectedCategory === 'All'
     ? allServices
@@ -125,23 +172,29 @@ export default function ServicesPage() {
       <section className="flex-1 px-4 py-12 gradient-section-1">
         <div className="mx-auto max-w-7xl">
           {/* Category Filter */}
-          <div className="mb-12 overflow-x-auto">
-            <div className="flex gap-3 pb-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${
-                    selectedCategory === cat
-                      ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg scale-105'
-                      : 'bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border hover:border-primary/50'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+          {loading ? (
+            <div className="mb-12 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-          </div>
+          ) : (
+            <div className="mb-12 overflow-x-auto">
+              <div className="flex gap-3 pb-2">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleCategoryChange(cat)}
+                    className={`px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all duration-300 ${
+                      selectedCategory === cat
+                        ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg scale-105'
+                        : 'bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border hover:border-primary/50'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -178,7 +231,7 @@ export default function ServicesPage() {
                   <div className="px-8 pb-8 pt-0 flex items-center justify-between relative z-10">
                     <span className="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">₹{service.price}</span>
                     <Link
-                      href={`/services/${service.id}`}
+                      href={`/puja/${service.id}`}
                       className="px-6 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl text-sm font-bold hover:shadow-xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2 shadow-lg"
                     >
                       View <ArrowRight className="w-4 h-4" />

@@ -2,13 +2,45 @@
 
 import Link from 'next/link'
 import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AuthModal } from './auth-modal'
+
+interface NavbarCategory {
+  id: string
+  name: string
+  slug: string
+}
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [navbarCategories, setNavbarCategories] = useState<NavbarCategory[]>([])
+
+  useEffect(() => {
+    fetchNavbarCategories()
+  }, [])
+
+  const fetchNavbarCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const categories = await response.json()
+        // Only show categories that have showOnNavbar: true
+        const navCategories = categories
+          .filter((cat: any) => cat.showOnNavbar === true)
+          .map((cat: any) => ({
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+          }))
+        setNavbarCategories(navCategories)
+      }
+    } catch (error) {
+      console.error('Error fetching navbar categories:', error)
+    }
+  }
+
 
   return (
     <nav className="sticky top-0 z-50 bg-background shadow-md">
@@ -108,17 +140,20 @@ export function Navbar() {
             <Link href="/astrology" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
               Astrological Predictions
             </Link>
+            {navbarCategories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/services?category=${category.slug}`}
+                className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary"
+              >
+                {category.name}
+              </Link>
+            ))}
+            <Link href="/services" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
+              Services
+            </Link>
             <Link href="/contact" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
               Contact
-            </Link>
-            <Link href="/services?category=pujas-vrat" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Pujas & Vrat
-            </Link>
-            <Link href="/services?category=yagnas-homas" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Yagnas / Homas
-            </Link>
-            <Link href="/services?category=dosha-nivaran" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Dosha Nivaran
             </Link>
           </div>
 
@@ -134,17 +169,20 @@ export function Navbar() {
               <Link href="/astrology" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
                 Astrological Predictions
               </Link>
+              {navbarCategories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/services?category=${category.slug}`}
+                  className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg"
+                >
+                  {category.name}
+                </Link>
+              ))}
+              <Link href="/services" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
+                Services
+              </Link>
               <Link href="/contact" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
                 Contact
-              </Link>
-              <Link href="/services?category=pujas-vrat" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Pujas & Vrat
-              </Link>
-              <Link href="/services?category=yagnas-homas" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Yagnas / Homas
-              </Link>
-              <Link href="/services?category=dosha-nivaran" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Dosha Nivaran
               </Link>
               <button
                 onClick={() => {

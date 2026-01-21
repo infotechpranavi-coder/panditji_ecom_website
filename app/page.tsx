@@ -293,7 +293,7 @@ export default function Home() {
               {latestPujas.map((service) => (
                 <Link
                   key={service.id}
-                  href={`/services/${service.id}`}
+                  href={`/puja/${service.id}`}
                   className="group flex-shrink-0 w-72 md:w-auto bg-white dark:bg-card rounded-xl border-2 border-border/50 overflow-hidden card-elevated hover:border-primary/70 hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
                   <div className="relative h-52 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 flex items-center justify-center overflow-hidden">
@@ -378,7 +378,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Large Featured Card */}
                   <Link
-                    href={`/services/${largeCard.id}`}
+                    href={`/puja/${largeCard.id}`}
                     key={`large-${currentIndex}`}
                     className="group md:col-span-2 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 rounded-2xl border-2 border-primary/20 overflow-hidden card-elevated hover:border-primary/50 hover:shadow-2xl transition-all duration-300 relative"
                   >
@@ -409,7 +409,7 @@ export default function Home() {
 
                   {/* Small Card 1 */}
                   <Link
-                    href={`/services/${smallCard1.id}`}
+                    href={`/puja/${smallCard1.id}`}
                     key={`small1-${currentIndex}`}
                     className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-primary/50 hover:shadow-xl transition-all duration-300 flex flex-col"
                   >
@@ -439,7 +439,7 @@ export default function Home() {
 
                   {/* Small Card 2 */}
                   <Link
-                    href={`/services/${smallCard2.id}`}
+                    href={`/puja/${smallCard2.id}`}
                     key={`small2-${currentIndex}`}
                     className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-primary/50 hover:shadow-xl transition-all duration-300 flex flex-col"
                   >
@@ -551,7 +551,7 @@ export default function Home() {
               return (
                 <Link
                   key={service.id}
-                  href={`/services/${service.id}`}
+                  href={`/puja/${service.id}`}
                   className={`group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-xl transition-all duration-300 relative ${isLarge ? 'sm:col-span-2 lg:col-span-2' : ''
                     }`}
                 >
@@ -604,7 +604,7 @@ export default function Home() {
             {chakraBalancing.map((service) => (
               <Link
                 key={service.id}
-                href={`/services/${service.id}`}
+                href={`/puja/${service.id}`}
                 className="group bg-white dark:bg-card rounded-xl border-2 border-border/50 overflow-hidden card-elevated hover:border-primary/70 hover:shadow-xl transition-all duration-300 flex flex-col"
               >
                 <div className="relative h-48 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-indigo-500/10 flex items-center justify-center overflow-hidden">

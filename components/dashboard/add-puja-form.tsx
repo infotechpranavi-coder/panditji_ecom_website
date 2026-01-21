@@ -1,40 +1,91 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Upload, X, Image as ImageIcon, Video } from 'lucide-react'
 
 interface PujaFormData {
   name: string
-  description: string
+  sku: string
   price: number
+  priceLabel: string
   category: string
+  categorySlug: string
+  shortDescription: string
+  fullDescription: string
   duration: string
   image: string | null
   video: string | null
+  specifications: Array<{ label: string; value: string }>
+  japaOptions: Array<{ label: string; value: string }>
   features: string[]
+}
+
+interface Category {
+  id: string
+  name: string
+  slug: string
 }
 
 export function AddPujaForm() {
   const [formData, setFormData] = useState<PujaFormData>({
     name: '',
-    description: '',
+    sku: '',
     price: 0,
+    priceLabel: 'From',
     category: '',
+    categorySlug: '',
+    shortDescription: '',
+    fullDescription: '',
     duration: '',
     image: null,
     video: null,
+    specifications: [],
+    japaOptions: [],
     features: [],
   })
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
   const [currentFeature, setCurrentFeature] = useState('')
+  const [currentSpecLabel, setCurrentSpecLabel] = useState('')
+  const [currentSpecValue, setCurrentSpecValue] = useState('')
+  const [currentJapaLabel, setCurrentJapaLabel] = useState('')
+  const [currentJapaValue, setCurrentJapaValue] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadType, setUploadType] = useState<'image' | 'video' | null>(null)
 
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true)
+      const response = await fetch('/api/categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data)
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    } finally {
+      setLoadingCategories(false)
+    }
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'price' ? parseFloat(value) || 0 : value,
-    }))
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [name]: name === 'price' ? parseFloat(value) || 0 : value,
+      }
+      // Auto-generate categorySlug from selected category
+      if (name === 'category') {
+        const selectedCategory = categories.find(c => c.name === value)
+        updated.categorySlug = selectedCategory ? selectedCategory.slug : value.toLowerCase().replace(/\s+/g, '-')
+      }
+      return updated
+    })
   }
 
   const handleAddFeature = () => {
@@ -54,6 +105,42 @@ export function AddPujaForm() {
     }))
   }
 
+  const handleAddSpecification = () => {
+    if (currentSpecLabel.trim() && currentSpecValue.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        specifications: [...prev.specifications, { label: currentSpecLabel.trim(), value: currentSpecValue.trim() }],
+      }))
+      setCurrentSpecLabel('')
+      setCurrentSpecValue('')
+    }
+  }
+
+  const handleRemoveSpecification = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      specifications: prev.specifications.filter((_, i) => i !== index),
+    }))
+  }
+
+  const handleAddJapaOption = () => {
+    if (currentJapaLabel.trim() && currentJapaValue.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        japaOptions: [...prev.japaOptions, { label: currentJapaLabel.trim(), value: currentJapaValue.trim() }],
+      }))
+      setCurrentJapaLabel('')
+      setCurrentJapaValue('')
+    }
+  }
+
+  const handleRemoveJapaOption = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      japaOptions: prev.japaOptions.filter((_, i) => i !== index),
+    }))
+  }
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -70,8 +157,7 @@ export function AddPujaForm() {
 
       // Upload to Cloudinary
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${
-          type === 'image' ? 'image' : 'video'
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${type === 'image' ? 'image' : 'video'
         }/upload`,
         {
           method: 'POST',
@@ -84,7 +170,7 @@ export function AddPujaForm() {
       }
 
       const data = await response.json()
-      
+
       // Update form data with the uploaded URL
       setFormData(prev => ({
         ...prev,
@@ -103,9 +189,15 @@ export function AddPujaForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
+    // Validate required fields
+    if (!formData.name || !formData.price || !formData.category) {
+      alert('Please fill in all required fields: Name, Price, and Category')
+      return
+    }
+
     try {
-      // Save to database
+      // Save to API (which will save to localStorage temporarily)
       const response = await fetch('/api/pujas', {
         method: 'POST',
         headers: {
@@ -115,26 +207,43 @@ export function AddPujaForm() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save puja')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to save puja')
       }
 
       const result = await response.json()
-      alert('Puja added successfully!')
-      
+
+      // Show success alert with details
+      alert(`✅ Puja Added Successfully!\n\nName: ${formData.name}\nPrice: ₹${formData.price}\nCategory: ${formData.category}\n\nID: ${result.id}\n\nThe product is now saved and available on the website.`)
+
       // Reset form
       setFormData({
         name: '',
-        description: '',
+        sku: '',
         price: 0,
+        priceLabel: 'From',
         category: '',
+        categorySlug: '',
+        shortDescription: '',
+        fullDescription: '',
         duration: '',
         image: null,
         video: null,
+        specifications: [],
+        japaOptions: [],
         features: [],
       })
-    } catch (error) {
+      setCurrentSpecLabel('')
+      setCurrentSpecValue('')
+      setCurrentJapaLabel('')
+      setCurrentJapaValue('')
+      setCurrentFeature('')
+
+      // Refresh the page to show the new puja in the list
+      window.location.reload()
+    } catch (error: any) {
       console.error('Error saving puja:', error)
-      alert('Failed to save puja. Please try again.')
+      alert(`❌ Failed to save puja: ${error.message || 'Please try again.'}`)
     }
   }
 
@@ -163,25 +272,58 @@ export function AddPujaForm() {
           />
         </div>
 
-        {/* Description */}
+        {/* SKU */}
         <div>
-          <label htmlFor="description" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Description *
+          <label htmlFor="sku" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            SKU
+          </label>
+          <input
+            type="text"
+            id="sku"
+            name="sku"
+            value={formData.sku}
+            onChange={handleInputChange}
+            placeholder="e.g., DP-001 or N/A"
+            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+          />
+        </div>
+
+        {/* Short Description */}
+        <div>
+          <label htmlFor="shortDescription" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Short Description *
           </label>
           <textarea
-            id="description"
-            name="description"
-            value={formData.description}
+            id="shortDescription"
+            name="shortDescription"
+            value={formData.shortDescription}
             onChange={handleInputChange}
             required
-            rows={4}
-            placeholder="Describe the puja service..."
+            rows={2}
+            placeholder="Brief description shown on product card..."
             className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
           />
         </div>
 
-        {/* Price and Category */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Full Description */}
+        <div>
+          <label htmlFor="fullDescription" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Full Description *
+          </label>
+          <textarea
+            id="fullDescription"
+            name="fullDescription"
+            value={formData.fullDescription}
+            onChange={handleInputChange}
+            required
+            rows={8}
+            placeholder="Complete detailed description with paragraphs, bullet points, etc..."
+            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
+          />
+        </div>
+
+        {/* Price, Price Label, and Category */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label htmlFor="price" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Price (INR) *
@@ -201,6 +343,22 @@ export function AddPujaForm() {
           </div>
 
           <div>
+            <label htmlFor="priceLabel" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              Price Label
+            </label>
+            <select
+              id="priceLabel"
+              name="priceLabel"
+              value={formData.priceLabel}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            >
+              <option value="From">From</option>
+              <option value="">Regular Price</option>
+            </select>
+          </div>
+
+          <div>
             <label htmlFor="category" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Category *
             </label>
@@ -210,15 +368,23 @@ export function AddPujaForm() {
               value={formData.category}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              disabled={loadingCategories}
+              className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="">Select Category</option>
-              <option value="festival">Festival Puja</option>
-              <option value="puja-vrat">Puja & Vrat</option>
-              <option value="chakra-balancing">Chakra Balancing</option>
-              <option value="yagnas-homas">Yagnas / Homas</option>
-              <option value="dosha-nivaran">Dosha Nivaran</option>
+              <option value="">
+                {loadingCategories ? 'Loading categories...' : 'Select Category'}
+              </option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
             </select>
+            {categories.length === 0 && !loadingCategories && (
+              <p className="text-sm text-muted-foreground mt-1">
+                No categories available. Please add categories first.
+              </p>
+            )}
           </div>
         </div>
 
@@ -306,6 +472,112 @@ export function AddPujaForm() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Specifications */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Specifications
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <input
+              type="text"
+              value={currentSpecLabel}
+              onChange={(e) => setCurrentSpecLabel(e.target.value)}
+              placeholder="Label (e.g., Duration)"
+              className="px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={currentSpecValue}
+                onChange={(e) => setCurrentSpecValue(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSpecification())}
+                placeholder="Value (e.g., 2-3 hours)"
+                className="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+              <button
+                type="button"
+                onClick={handleAddSpecification}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {formData.specifications.map((spec, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+              >
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 dark:text-white">{spec.label}:</span>
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">{spec.value}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSpecification(index)}
+                  className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded"
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Japa Options */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Japa Options
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <input
+              type="text"
+              value={currentJapaLabel}
+              onChange={(e) => setCurrentJapaLabel(e.target.value)}
+              placeholder="Label (e.g., 11000 Chants)"
+              className="px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={currentJapaValue}
+                onChange={(e) => setCurrentJapaValue(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddJapaOption())}
+                placeholder="Value (e.g., 11000)"
+                className="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+              <button
+                type="button"
+                onClick={handleAddJapaOption}
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {formData.japaOptions.map((japa, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+              >
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 dark:text-white">{japa.label}</span>
+                  <span className="ml-2 text-gray-600 dark:text-gray-400">({japa.value})</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveJapaOption(index)}
+                  className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded"
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 

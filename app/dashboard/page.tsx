@@ -3,7 +3,8 @@
 import { AddPujaForm } from '@/components/dashboard/add-puja-form'
 import { PujaList } from '@/components/dashboard/puja-list'
 import { CustomerBookings } from '@/components/dashboard/customer-bookings'
-import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { CategoryManager } from '@/components/dashboard/category-manager'
+import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function DashboardPage() {
@@ -13,7 +14,7 @@ export default function DashboardPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'bookings'>('add')
+  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'bookings' | 'categories'>('add')
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -208,10 +209,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b-2 border-gray-200 dark:border-gray-700">
+        <div className="flex gap-2 mb-6 border-b-2 border-gray-200 dark:border-gray-700 overflow-x-auto">
           <button
             onClick={() => setActiveTab('add')}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
               activeTab === 'add'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-primary'
@@ -221,7 +222,7 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => setActiveTab('manage')}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
               activeTab === 'manage'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-primary'
@@ -230,8 +231,19 @@ export default function DashboardPage() {
             Manage Pujas
           </button>
           <button
+            onClick={() => setActiveTab('categories')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'categories'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-primary'
+            }`}
+          >
+            <Folder className="w-4 h-4" />
+            Categories
+          </button>
+          <button
             onClick={() => setActiveTab('bookings')}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
               activeTab === 'bookings'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-primary'
@@ -245,6 +257,7 @@ export default function DashboardPage() {
         <div>
           {activeTab === 'add' && <AddPujaForm />}
           {activeTab === 'manage' && <PujaList />}
+          {activeTab === 'categories' && <CategoryManager />}
           {activeTab === 'bookings' && <CustomerBookings />}
         </div>
       </main>
