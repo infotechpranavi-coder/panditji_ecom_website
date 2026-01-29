@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect()
-    const { id } = params
+    const { id } = await context.params
     console.log(`Fetching puja with ID: ${id}`)
 
     let puja = null
@@ -45,11 +45,11 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect()
-    const { id } = params
+    const { id } = await context.params
 
     let result = await Puja.findByIdAndDelete(id).catch(() => null)
     if (!result) {

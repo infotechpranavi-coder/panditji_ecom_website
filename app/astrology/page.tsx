@@ -46,7 +46,7 @@ export default function AstrologyPage() {
       await new Promise(resolve => setTimeout(resolve, 1000))
 
       alert('✅ Your astrological prediction request has been submitted successfully! Our astrologers will contact you soon.')
-      
+
       // Reset form
       setFormData({
         name: '',
@@ -322,7 +322,11 @@ export default function AstrologyPage() {
                         -{product.discount}%
                       </div>
                     )}
-                    <div className="text-7xl opacity-30 group-hover:scale-110 transition-transform duration-300">🙏</div>
+                    {product.image && product.image !== '/placeholder.jpg' ? (
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    ) : (
+                      <div className="text-7xl opacity-30 group-hover:scale-110 transition-transform duration-300">🙏</div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div className="p-5 flex-1 flex flex-col bg-white dark:bg-card">

@@ -309,7 +309,8 @@ export default function Home() {
                             {largeCard.name}
                           </h3>
                           <p className="text-muted-foreground mb-4 line-clamp-2">
-                            Experience the divine blessings of this sacred festival puja
+                            {(largeCard.shortDescription || largeCard.description || 'Experience the divine blessings of this sacred festival puja').split(' ').slice(0, 4).join(' ')}
+                            {(largeCard.shortDescription || largeCard.description || '').split(' ').length > 4 ? '...' : ''}
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">

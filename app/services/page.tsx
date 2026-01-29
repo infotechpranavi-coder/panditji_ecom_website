@@ -121,6 +121,7 @@ function ServicesContent() {
           description: puja.shortDescription || puja.description || '',
           duration: puja.duration || 'N/A',
           icon: iconMap[puja.category] || Gift,
+          image: puja.image,
         }))
         setAllServices(services)
       } else {
@@ -212,16 +213,23 @@ function ServicesContent() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="p-8 relative z-10">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="p-4 bg-gradient-to-br from-primary/30 to-accent/20 rounded-xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-lg">
-                        <Icon className="w-8 h-8 text-primary" />
+                    <div className="flex items-start justify-between mb-10">
+                      <div className="w-32 h-32 bg-white rounded-2xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-md overflow-hidden flex items-center justify-center border border-primary/10">
+                        {service.image ? (
+                          <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-4xl">🕉️</div>
+                        )}
                       </div>
-                      <span className="text-xs px-4 py-2 bg-white/80 backdrop-blur-sm text-primary rounded-full font-bold shadow-sm">
+                      <span className="text-xs px-4 py-2 bg-white/80 backdrop-blur-sm text-primary rounded-full font-bold shadow-sm border border-primary/10">
                         {service.category}
                       </span>
                     </div>
-                    <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">{service.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{service.description}</p>
+                    <h3 className="font-bold text-2xl mb-4 group-hover:text-primary transition-colors">{service.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                      {service.description.split(/\s+/).filter(Boolean).slice(0, 4).join(' ')}
+                      {service.description.split(/\s+/).filter(Boolean).length > 4 ? '...' : ''}
+                    </p>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b border-border/50">
                       <span className="flex items-center gap-2">⏱️ <span className="font-semibold">{service.duration}</span></span>
                     </div>

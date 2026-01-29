@@ -4,11 +4,11 @@ import Category from '@/models/Category'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect()
-    const { id } = params
+    const { id } = await context.params
 
     // Support both MongoDB ObjectId and the old string IDs
     let result = await Category.findByIdAndDelete(id).catch(() => null)
@@ -29,11 +29,11 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect()
-    const { id } = params
+    const { id } = await context.params
     const body = await request.json()
 
     // Support both MongoDB ObjectId and the old string IDs
