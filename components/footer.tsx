@@ -31,12 +31,31 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-bold text-lg mb-6">Connect</h4>
-            <ul className="space-y-3 text-sm">
-              <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Facebook</a></li>
-              <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Instagram</a></li>
-              <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">WhatsApp</a></li>
-              <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Email</a></li>
+            <h4 className="font-bold text-lg mb-6">Contact Us</h4>
+            <ul className="space-y-4 text-sm">
+              <li className="flex gap-3">
+                <span className="opacity-70 flex-shrink-0">📍</span>
+                <span className="opacity-95 leading-relaxed">
+                  B-10/303, Ramjash CHS, Ramdev park, near bhakti Ram mandir, Mira Road (E) - 401107
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="opacity-70 flex-shrink-0">📞</span>
+                <span className="opacity-95">
+                  <a href="tel:+917021324717" className="hover:text-white transition-colors">+91 7021324717</a> (Primary)
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="opacity-70 flex-shrink-0">📱</span>
+                <div className="flex flex-col gap-1">
+                  <span className="opacity-95">
+                    <a href="tel:+919320955282" className="hover:text-white transition-colors">+91 9320955282</a>
+                  </span>
+                  <span className="opacity-95">
+                    <a href="tel:+919594429032" className="hover:text-white transition-colors">+91 9594429032</a>
+                  </span>
+                </div>
+              </li>
             </ul>
           </div>
         </div>

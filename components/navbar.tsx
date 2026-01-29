@@ -53,9 +53,11 @@ export function Navbar() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-10 text-sm">
             <div className="flex items-center gap-6">
-              <Link href="tel:+911234567890" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-                <Phone className="w-4 h-4" />
-                <span className="font-medium">Call Us: +91 1234567890</span>
+              <Link href="tel:+917021324717" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Phone className="w-4 h-4 text-primary" />
+                </div>
+                <span className="font-medium">Call Us: +91 7021324717</span>
               </Link>
             </div>
             <div className="flex items-center gap-4">

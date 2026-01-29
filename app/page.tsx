@@ -110,11 +110,11 @@ export default function Home() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
-                  href="tel:+911234567890"
-                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white dark:bg-card border-2 border-primary/30 text-primary rounded-xl font-bold text-lg hover:bg-primary/5 transition-all duration-300"
+                  href="tel:+917021324717"
+                  className="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 hover:scale-105 transition-all duration-300 inline-flex items-center justify-center shadow-2xl"
                 >
-                  <Phone className="w-5 h-5" />
-                  <span>Call Now</span>
+                  <Phone className="w-5 h-5 mr-2" />
+                  Call: +91 7021324717
                 </Link>
               </div>
 

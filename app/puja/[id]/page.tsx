@@ -107,7 +107,7 @@ export default function PujaDetailPage() {
 
   const handleWhatsAppBuy = () => {
     const message = `Hi, I want to book: ${puja.name} - ₹${puja.price}`
-    window.open(`https://wa.me/911234567890?text=${encodeURIComponent(message)}`, '_blank')
+    window.open(`https://wa.me/917021324717?text=${encodeURIComponent(message)}`, '_blank')
   }
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
