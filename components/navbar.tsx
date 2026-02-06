@@ -85,8 +85,8 @@ export function Navbar() {
                 🕉️
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-primary">Book My</span>
-                <span className="text-xl font-extrabold text-accent -mt-1">Panditji</span>
+                <span className="text-xl font-extrabold text-primary">Book </span>
+                <span className="text-xl font-extrabold text-accent -mt-1">Panditji Seva</span>
               </div>
             </Link>
 

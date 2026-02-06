@@ -6,7 +6,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div>
             <h3 className="font-extrabold text-2xl mb-6 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              ✨ Book My Panditji
+              ✨ Book Panditji Seva
             </h3>
             <p className="text-sm opacity-95 leading-relaxed">
               Bringing authentic traditional Indian temple services to your home with devotion and grace
@@ -60,7 +60,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-white/20 pt-8 text-sm opacity-95 text-center">
-          <p className="font-semibold">&copy; 2024 Book My Panditji. All rights reserved. | Traditional Services, Modern Access</p>
+          <p className="font-semibold">&copy; 2024 Book Panditji Seva. All rights reserved. | Traditional Services, Modern Access</p>
         </div>
       </div>
     </footer>

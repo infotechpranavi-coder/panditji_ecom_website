@@ -4,7 +4,8 @@ import { AddPujaForm } from '@/components/dashboard/add-puja-form'
 import { PujaList } from '@/components/dashboard/puja-list'
 import { CustomerBookings } from '@/components/dashboard/customer-bookings'
 import { CategoryManager } from '@/components/dashboard/category-manager'
-import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder } from 'lucide-react'
+import { BannerManager } from '@/components/dashboard/banner-manager'
+import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder, Image } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function DashboardPage() {
@@ -14,7 +15,7 @@ export default function DashboardPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'bookings' | 'categories'>('add')
+  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'bookings' | 'categories' | 'banners'>('add')
 
   const [stats, setStats] = useState({
     totalPujas: 0,
@@ -252,6 +253,16 @@ export default function DashboardPage() {
             Categories
           </button>
           <button
+            onClick={() => setActiveTab('banners')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'banners'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-primary'
+              }`}
+          >
+            <Image className="w-4 h-4" />
+            Hero Banner
+          </button>
+          <button
             onClick={() => setActiveTab('bookings')}
             className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${activeTab === 'bookings'
               ? 'border-primary text-primary'
@@ -267,6 +278,7 @@ export default function DashboardPage() {
           {activeTab === 'add' && <AddPujaForm />}
           {activeTab === 'manage' && <PujaList />}
           {activeTab === 'categories' && <CategoryManager />}
+          {activeTab === 'banners' && <BannerManager />}
           {activeTab === 'bookings' && <CustomerBookings />}
         </div>
       </main>

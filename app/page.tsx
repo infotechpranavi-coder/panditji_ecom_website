@@ -16,11 +16,27 @@ const chakraBalancing: any[] = []
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [pujas, setPujas] = useState<any[]>([])
+  const [heroBanner, setHeroBanner] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchPujas()
+    fetchBanner()
   }, [])
+
+  const fetchBanner = async () => {
+    try {
+      const response = await fetch('/api/banners?active=true')
+      if (response.ok) {
+        const data = await response.json()
+        if (data && data._id) {
+          setHeroBanner(data)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching banner:', error)
+    }
+  }
 
   const fetchPujas = async () => {
     try {
@@ -74,102 +90,158 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Hero Section - Creative Asymmetric Layout */}
-      <section className="relative px-4 py-12 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,0,0.08),transparent_50%)]" />
-        <div className="mx-auto max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Content - Takes 7 columns */}
-            <div className="lg:col-span-7 space-y-8">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-sm rounded-full border border-primary/20 shadow-lg">
-                <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                <span className="text-sm font-bold text-primary">✨ Authentic Traditional Services</span>
-              </div>
+      {/* Hero Section - Conditional Rendering */}
+      {heroBanner ? (
+        // Dynamic Hero Banner
+        <section className="relative min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src={heroBanner.imageUrl}
+              alt={heroBanner.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Overlay removed as per user request */}
+          </div>
 
-              {/* Main Heading */}
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight">
-                  Connect with{' '}
-                  <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                    Divine Traditions
-                  </span>
-                </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
-                  Book authentic puja services performed by certified priests. Experience sacred rituals from anywhere, anytime.
-                </p>
-              </div>
-
-              {/* CTA Section */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link
-                  href="/services"
-                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                >
-                  <span>Explore Services</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="tel:+917021324717"
-                  className="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 hover:scale-105 transition-all duration-300 inline-flex items-center justify-center shadow-2xl"
-                >
-                  <Phone className="w-5 h-5 mr-2" />
-                  Call: +91 7021324717
-                </Link>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-6">
-                {[
-                  { icon: Users, value: '500+', label: 'Devotees' },
-                  { icon: Award, value: '25+', label: 'Priests' },
-                  { icon: Star, value: '4.8', label: 'Rating' },
-                ].map((stat, i) => (
-                  <div key={i} className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl border border-primary/10">
-                    <stat.icon className="w-6 h-6 text-primary mx-auto mb-2" />
-                    <div className="text-2xl font-extrabold text-primary mb-1">{stat.value}</div>
-                    <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Visual - Takes 5 columns, Creative Layout */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative">
-                {/* Main Card - Glassmorphism */}
-                <div className="bg-gradient-to-br from-primary/20 via-accent/20 to-primary/10 backdrop-blur-xl rounded-3xl p-8 border border-primary/20 shadow-2xl">
-                  <div className="space-y-6">
-                    {/* Icon Circle */}
-                    <div className="w-32 h-32 mx-auto bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow-xl">
-                      <div className="text-6xl">🕉️</div>
-                    </div>
-
-                    {/* Feature Cards */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {[
-                        { icon: Shield, text: 'Certified' },
-                        { icon: Heart, text: 'Authentic' },
-                        { icon: Clock, text: 'On Time' },
-                        { icon: Flame, text: 'Divine' },
-                      ].map((item, i) => (
-                        <div key={i} className="p-4 bg-white/50 dark:bg-card/50 backdrop-blur-sm rounded-xl border border-primary/10 text-center hover:scale-105 transition-transform">
-                          <item.icon className="w-6 h-6 text-primary mx-auto mb-2" />
-                          <div className="text-xs font-semibold text-primary">{item.text}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
+            {(heroBanner.title || heroBanner.description) && (
+              <div className="space-y-6 max-w-4xl mx-auto">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-4 animate-fade-in">
+                  <Sparkles className="w-4 h-4 text-accent" />
+                  <span className="text-sm font-bold text-white">Authentic Spiritual Services</span>
                 </div>
 
-                {/* Floating Elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-accent/30 to-primary/30 rounded-2xl rotate-12 blur-sm animate-pulse" />
-                <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-primary/30 to-accent/30 rounded-full -rotate-12 blur-sm animate-pulse delay-300" />
+                {heroBanner.title && (
+                  <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg tracking-tight mb-6">
+                    {heroBanner.title}
+                  </h1>
+                )}
+
+                {heroBanner.description && (
+                  <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md mb-8">
+                    {heroBanner.description}
+                  </p>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                  <Link
+                    href="/services"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                  >
+                    <span>Explore Services</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                  <Link
+                    href="tel:+917021324717"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 hover:scale-105 transition-all duration-300"
+                  >
+                    <Phone className="w-5 h-5" />
+                    <span>Contact Us</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      ) : (
+        // Fallback: Original Creative Asymmetric Layout
+        <section className="relative px-4 py-12 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,200,0,0.08),transparent_50%)]" />
+          <div className="mx-auto max-w-7xl relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Left Content - Takes 7 columns */}
+              <div className="lg:col-span-7 space-y-8">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-sm rounded-full border border-primary/20 shadow-lg">
+                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                  <span className="text-sm font-bold text-primary">✨ Authentic Traditional Services</span>
+                </div>
+
+                {/* Main Heading */}
+                <div className="space-y-4">
+                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight">
+                    Connect with{' '}
+                    <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
+                      Divine Traditions
+                    </span>
+                  </h1>
+                  <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
+                    Book authentic puja services performed by certified priests. Experience sacred rituals from anywhere, anytime.
+                  </p>
+                </div>
+
+                {/* CTA Section */}
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <Link
+                    href="/services"
+                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                  >
+                    <span>Explore Services</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link
+                    href="tel:+917021324717"
+                    className="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white dark:text-gray-200 rounded-xl font-bold text-lg hover:bg-gray-100/10 hover:scale-105 transition-all duration-300 inline-flex items-center justify-center shadow-lg transform"
+                  >
+                    <Phone className="w-5 h-5 mr-2" />
+                    Call: +91 7021324717
+                  </Link>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-3 gap-4 pt-6">
+                  {[
+                    { icon: Users, value: '500+', label: 'Devotees' },
+                    { icon: Award, value: '25+', label: 'Priests' },
+                    { icon: Star, value: '4.8', label: 'Rating' },
+                  ].map((stat, i) => (
+                    <div key={i} className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl border border-primary/10">
+                      <stat.icon className="w-6 h-6 text-primary mx-auto mb-2" />
+                      <div className="text-2xl font-extrabold text-primary mb-1">{stat.value}</div>
+                      <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Visual - Takes 5 columns, Creative Layout */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative">
+                  {/* Main Card - Glassmorphism */}
+                  <div className="bg-gradient-to-br from-primary/20 via-accent/20 to-primary/10 backdrop-blur-xl rounded-3xl p-8 border border-primary/20 shadow-2xl">
+                    <div className="space-y-6">
+                      {/* Icon Circle */}
+                      <div className="w-32 h-32 mx-auto bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow-xl">
+                        <div className="text-6xl">🕉️</div>
+                      </div>
+
+                      {/* Feature Cards */}
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { icon: Shield, text: 'Certified' },
+                          { icon: Heart, text: 'Authentic' },
+                          { icon: Clock, text: 'On Time' },
+                          { icon: Flame, text: 'Divine' },
+                        ].map((item, i) => (
+                          <div key={i} className="p-4 bg-white/50 dark:bg-card/50 backdrop-blur-sm rounded-xl border border-primary/10 text-center hover:scale-105 transition-transform">
+                            <item.icon className="w-6 h-6 text-primary mx-auto mb-2" />
+                            <div className="text-xs font-semibold text-primary">{item.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floating Elements */}
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-accent/30 to-primary/30 rounded-2xl rotate-12 blur-sm animate-pulse" />
+                  <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-primary/30 to-accent/30 rounded-full -rotate-12 blur-sm animate-pulse delay-300" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Latest Puja Section - Professional Title Design */}
       {displayLatestPujas.length > 0 && (
