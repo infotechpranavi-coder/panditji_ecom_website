@@ -147,9 +147,9 @@ export function CalendarWidget({ onDateSelect }: CalendarWidgetProps) {
                 </div>
                 <div className="space-y-2.5">
                     {[
-                        { date: '14', festival: 'Makar Sankranti' },
-                        { date: '26', festival: 'Republic Day' },
-                        { date: '8', festival: 'Maha Shivratri' },
+                        { date: '1', festival: 'Vasant Panchami' },
+                        { date: '13', festival: 'Ratha Saptami' },
+                        { date: '15', festival: 'Maha Shivratri' },
                     ].map((item, i) => (
                         <div key={i} className="p-3 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5 rounded-xl border border-primary/20 flex items-center gap-3 hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
                             <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -169,7 +169,7 @@ export function CalendarWidget({ onDateSelect }: CalendarWidgetProps) {
                 <div className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/20">
                     <p className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        Plan Your Festivals with Book My Panditji
+                        Plan Your Festivals with Book Panditji Seva
                     </p>
                     <div className="bg-accent/20 dark:bg-accent/10 p-3 rounded-lg border border-accent/30">
                         <p className="text-xs text-gray-800 dark:text-gray-200 font-bold leading-relaxed">

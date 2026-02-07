@@ -1,3 +1,6 @@
+import Link from 'next/link'
+import { MapPin, Phone, Smartphone } from 'lucide-react'
+
 export function Footer() {
   return (
     <footer className="bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground py-16 mt-20 relative overflow-hidden">
@@ -25,7 +28,7 @@ export function Footer() {
             <h4 className="font-bold text-lg mb-6">Company</h4>
             <ul className="space-y-3 text-sm">
               <li><a href="/about" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">About Us</a></li>
-              <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Contact</a></li>
+              <li><Link href="/contact" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Contact</Link></li>
               <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Blog</a></li>
               <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">FAQs</a></li>
             </ul>
@@ -34,19 +37,19 @@ export function Footer() {
             <h4 className="font-bold text-lg mb-6">Contact Us</h4>
             <ul className="space-y-4 text-sm">
               <li className="flex gap-3">
-                <span className="opacity-70 flex-shrink-0">📍</span>
+                <MapPin className="opacity-70 flex-shrink-0 w-5 h-5 text-white" />
                 <span className="opacity-95 leading-relaxed">
                   B-10/303, Ramjash CHS, Ramdev park, near bhakti Ram mandir, Mira Road (E) - 401107
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="opacity-70 flex-shrink-0">📞</span>
+                <Phone className="opacity-70 flex-shrink-0 w-5 h-5 text-white" />
                 <span className="opacity-95">
                   <a href="tel:+917021324717" className="hover:text-white transition-colors">+91 7021324717</a> (Primary)
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="opacity-70 flex-shrink-0">📱</span>
+                <Smartphone className="opacity-70 flex-shrink-0 w-5 h-5 text-white" />
                 <div className="flex flex-col gap-1">
                   <span className="opacity-95">
                     <a href="tel:+919320955282" className="hover:text-white transition-colors">+91 9320955282</a>
@@ -59,8 +62,19 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/20 pt-8 text-sm opacity-95 text-center">
-          <p className="font-semibold">&copy; 2024 Book Panditji Seva. All rights reserved. | Traditional Services, Modern Access</p>
+        <div className="border-t border-white/20 pt-8 text-sm opacity-95 text-center flex flex-col items-center gap-4">
+          <p className="font-semibold">&copy; 2026 Book Panditji Seva. All rights reserved. | Traditional Services, Modern Access</p>
+          <p className="text-xs opacity-80 flex items-center gap-1">
+            Powered by{' '}
+            <a
+              href="https://pranaviinfotech.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold border-b border-transparent hover:border-white transition-all"
+            >
+              Pranavi Infotech
+            </a>
+          </p>
         </div>
       </div>
     </footer>

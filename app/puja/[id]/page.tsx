@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { WhatsAppButton } from '@/components/whatsapp-button'
+import { BookingModal } from '@/components/booking-modal'
 import { useState, useEffect } from 'react'
 import { ChevronRight, Facebook, Twitter, Linkedin, MessageCircle, Share2, Star, Check, Sparkles } from 'lucide-react'
 
@@ -16,6 +17,7 @@ export default function PujaDetailPage() {
   const [activeTab, setActiveTab] = useState<'description' | 'specification' | 'reviews'>('description')
   const [selectedJapa, setSelectedJapa] = useState('')
   const [quantity, setQuantity] = useState(1)
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -101,8 +103,7 @@ export default function PujaDetailPage() {
   }
 
   const handleBuyNow = () => {
-    handleAddToCart()
-    window.location.href = '/checkout'
+    setIsBookingModalOpen(true)
   }
 
   const handleWhatsAppBuy = () => {
@@ -256,12 +257,12 @@ export default function PujaDetailPage() {
 
               {/* Action Buttons */}
               <div className="space-y-3 mb-6">
-                <button
+                {/* <button
                   onClick={handleAddToCart}
                   className="w-full px-6 py-3 bg-gray-900 dark:bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
                 >
                   Add to cart
-                </button>
+                </button> */}
                 <button
                   onClick={handleBuyNow}
                   className="w-full px-6 py-3 bg-gradient-to-r from-accent to-accent/90 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-lg"
@@ -382,6 +383,13 @@ export default function PujaDetailPage() {
 
       <Footer />
       <WhatsAppButton />
+
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        puja={puja}
+        selectedJapa={selectedJapa}
+      />
     </div>
   )
 }

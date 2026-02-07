@@ -108,12 +108,13 @@ export function Navbar() {
 
             {/* User Actions */}
             <div className="flex items-center gap-4 flex-shrink-0">
-              <Link href="/cart" className="relative p-2 hover:bg-primary/10 rounded-lg transition-all group">
-                <ShoppingCart className="w-6 h-6 group-hover:text-primary transition-colors" />
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary to-accent text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold shadow-lg" id="cart-count">
-                  0
-                </span>
-              </Link>
+              {/* Cart Icon - Disabled for now */}
+              {/* <Link href="/cart" className="relative p-2 hover:bg-primary/10 rounded-lg transition-all group">
+              <ShoppingCart className="w-6 h-6 group-hover:text-primary transition-colors" />
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary to-accent text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold shadow-lg" id="cart-count">
+                0
+              </span>
+            </Link> */}
               <button
                 onClick={() => setIsAuthModalOpen(true)}
                 className="hidden md:flex items-center gap-2 px-4 py-2 hover:bg-primary/10 rounded-lg transition-all group"

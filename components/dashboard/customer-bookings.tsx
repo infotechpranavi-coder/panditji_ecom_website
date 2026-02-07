@@ -4,17 +4,17 @@ import { useState, useEffect } from 'react'
 import { Calendar, User, Phone, Mail, MapPin, Search, Filter, CheckCircle2, Clock, XCircle } from 'lucide-react'
 
 interface Booking {
-  id: string
+  _id: string
   customerName: string
   customerEmail: string
   customerPhone: string
-  customerAddress: string
+  customerAddress?: string
   pujaName: string
   pujaId: string
-  bookingDate: string
-  bookingTime: string
+  date: string
+  bookingTime?: string
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-  totalAmount: number
+  totalPrice: number
   createdAt: string
 }
 
@@ -55,7 +55,7 @@ export function CustomerBookings() {
       if (response.ok) {
         setBookings(prev =>
           prev.map(booking =>
-            booking.id === bookingId ? { ...booking, status: newStatus } : booking
+            booking._id === bookingId ? { ...booking, status: newStatus } : booking
           )
         )
         alert('Booking status updated successfully!')
@@ -168,7 +168,7 @@ export function CustomerBookings() {
         ) : (
           filteredBookings.map((booking) => (
             <div
-              key={booking.id}
+              key={booking._id}
               className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:border-primary/50 transition-colors"
             >
               <div className="flex flex-col lg:flex-row gap-6">
@@ -214,12 +214,12 @@ export function CustomerBookings() {
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <span className="text-gray-700 dark:text-gray-300">
-                        {new Date(booking.bookingDate).toLocaleDateString()} at {booking.bookingTime}
+                        {new Date(booking.date).toLocaleDateString()} {booking.bookingTime && `at ${booking.bookingTime}`}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-semibold text-gray-700 dark:text-gray-300">Amount:</span>
-                      <span className="text-primary font-bold">₹{booking.totalAmount.toLocaleString()}</span>
+                      <span className="text-primary font-bold">₹{(booking.totalPrice || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -229,13 +229,13 @@ export function CustomerBookings() {
                   {booking.status === 'pending' && (
                     <>
                       <button
-                        onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                        onClick={() => handleStatusUpdate(booking._id, 'confirmed')}
                         className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
                       >
                         Confirm Booking
                       </button>
                       <button
-                        onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                        onClick={() => handleStatusUpdate(booking._id, 'cancelled')}
                         className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold"
                       >
                         Cancel Booking
@@ -244,7 +244,7 @@ export function CustomerBookings() {
                   )}
                   {booking.status === 'confirmed' && (
                     <button
-                      onClick={() => handleStatusUpdate(booking.id, 'completed')}
+                      onClick={() => handleStatusUpdate(booking._id, 'completed')}
                       className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold"
                     >
                       Mark as Completed
