@@ -18,6 +18,8 @@ interface PujaFormData {
   specifications: Array<{ label: string; value: string }>
   japaOptions: Array<{ label: string; value: string }>
   features: string[]
+  faqs: Array<{ question: string; answer: string }>
+  reviews: Array<{ user: string; rating: number; comment: string; date?: string }>
 }
 
 interface Category {
@@ -26,7 +28,12 @@ interface Category {
   slug: string
 }
 
-export function AddPujaForm() {
+interface AddPujaFormProps {
+  editingPuja?: any
+  onCancelEdit?: () => void
+}
+
+export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
   const [formData, setFormData] = useState<PujaFormData>({
     name: '',
     sku: '',
@@ -42,6 +49,8 @@ export function AddPujaForm() {
     specifications: [],
     japaOptions: [],
     features: [],
+    faqs: [],
+    reviews: [],
   })
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
@@ -50,6 +59,11 @@ export function AddPujaForm() {
   const [currentSpecValue, setCurrentSpecValue] = useState('')
   const [currentJapaLabel, setCurrentJapaLabel] = useState('')
   const [currentJapaValue, setCurrentJapaValue] = useState('')
+  const [currentFaqQuestion, setCurrentFaqQuestion] = useState('')
+  const [currentFaqAnswer, setCurrentFaqAnswer] = useState('')
+  const [currentReviewUser, setCurrentReviewUser] = useState('')
+  const [currentReviewRating, setCurrentReviewRating] = useState(5)
+  const [currentReviewComment, setCurrentReviewComment] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadType, setUploadType] = useState<'image' | 'video' | null>(null)
 
@@ -57,13 +71,43 @@ export function AddPujaForm() {
     fetchCategories()
   }, [])
 
+  // Pre-populate form when editing
+  useEffect(() => {
+    if (editingPuja) {
+      setFormData({
+        name: editingPuja.name || '',
+        sku: editingPuja.sku || '',
+        price: editingPuja.price || 0,
+        priceLabel: editingPuja.priceLabel || 'From',
+        category: editingPuja.category || '',
+        categorySlug: editingPuja.categorySlug || '',
+        shortDescription: editingPuja.shortDescription || '',
+        fullDescription: editingPuja.fullDescription || editingPuja.description || '',
+        duration: editingPuja.duration || '',
+        image: editingPuja.image || null,
+        video: editingPuja.video || null,
+        specifications: editingPuja.specifications || [],
+        japaOptions: editingPuja.japaOptions || [],
+        features: editingPuja.features || [],
+        faqs: editingPuja.faqs || [],
+        reviews: editingPuja.reviews || [],
+      })
+    }
+  }, [editingPuja])
+
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true)
       const response = await fetch('/api/categories')
       if (response.ok) {
         const data = await response.json()
-        setCategories(data)
+        const normalized = data
+          .filter((cat: any) => cat.isService !== false)
+          .map((cat: any) => ({
+            ...cat,
+            id: cat.id || cat._id
+          }))
+        setCategories(normalized)
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
@@ -141,6 +185,51 @@ export function AddPujaForm() {
     }))
   }
 
+  const handleAddFaq = () => {
+    if (currentFaqQuestion.trim() && currentFaqAnswer.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        faqs: [...prev.faqs, { question: currentFaqQuestion.trim(), answer: currentFaqAnswer.trim() }],
+      }))
+      setCurrentFaqQuestion('')
+      setCurrentFaqAnswer('')
+    }
+  }
+
+  const handleRemoveFaq = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index),
+    }))
+  }
+
+  const handleAddReview = () => {
+    if (currentReviewUser.trim() && currentReviewComment.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        reviews: [
+          ...prev.reviews,
+          {
+            user: currentReviewUser.trim(),
+            rating: currentReviewRating,
+            comment: currentReviewComment.trim(),
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+          }
+        ],
+      }))
+      setCurrentReviewUser('')
+      setCurrentReviewRating(5)
+      setCurrentReviewComment('')
+    }
+  }
+
+  const handleRemoveReview = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      reviews: prev.reviews.filter((_, i) => i !== index),
+    }))
+  }
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -204,9 +293,12 @@ export function AddPujaForm() {
     }
 
     try {
-      // Save to API (which will save to localStorage temporarily)
-      const response = await fetch('/api/pujas', {
-        method: 'POST',
+      const isEditing = !!editingPuja
+      const url = isEditing ? `/api/pujas/${editingPuja.id || editingPuja._id}` : '/api/pujas'
+      const method = isEditing ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -215,13 +307,14 @@ export function AddPujaForm() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to save puja')
+        throw new Error(errorData.error || `Failed to ${isEditing ? 'update' : 'save'} puja`)
       }
 
       const result = await response.json()
 
       // Show success alert with details
-      alert(`✅ Puja Added Successfully!\n\nName: ${formData.name}\nPrice: ₹${formData.price}\nCategory: ${formData.category}\n\nID: ${result.id}\n\nThe product is now saved and available on the website.`)
+      const action = isEditing ? 'Updated' : 'Added'
+      alert(`✅ Puja ${action} Successfully!\n\nName: ${formData.name}\nPrice: ₹${formData.price}\nCategory: ${formData.category}\n\nThe product is now ${isEditing ? 'updated' : 'saved'} and available on the website.`)
 
       // Reset form
       setFormData({
@@ -239,27 +332,47 @@ export function AddPujaForm() {
         specifications: [],
         japaOptions: [],
         features: [],
+        faqs: [],
+        reviews: [],
       })
       setCurrentSpecLabel('')
       setCurrentSpecValue('')
       setCurrentJapaLabel('')
       setCurrentJapaValue('')
       setCurrentFeature('')
+      setCurrentFaqQuestion('')
+      setCurrentFaqAnswer('')
 
-      // Refresh the page to show the new puja in the list
+      // Clear editing state
+      if (isEditing && onCancelEdit) {
+        onCancelEdit()
+      }
+
+      // Refresh the page to show the updated puja in the list
       window.location.reload()
     } catch (error: any) {
       console.error('Error saving puja:', error)
-      alert(`❌ Failed to save puja: ${error.message || 'Please try again.'}`)
+      alert(`❌ Failed to ${editingPuja ? 'update' : 'save'} puja: ${error.message || 'Please try again.'}`)
     }
   }
 
   return (
     <div className="bg-white dark:bg-card rounded-2xl border-2 border-border p-6 shadow-lg">
-      <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-        <Plus className="w-6 h-6 text-primary" />
-        Add New Puja
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+          <Plus className="w-6 h-6 text-primary" />
+          {editingPuja ? 'Edit Puja' : 'Add New Puja'}
+        </h2>
+        {editingPuja && onCancelEdit && (
+          <button
+            type="button"
+            onClick={onCancelEdit}
+            className="px-4 py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+          >
+            Cancel Edit
+          </button>
+        )}
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name */}
@@ -588,6 +701,123 @@ export function AddPujaForm() {
           </div>
         </div>
 
+        {/* FAQ Section */}
+        <div className="border-t-2 border-border/50 pt-6">
+          <label className="block text-lg font-bold text-gray-900 dark:text-white mb-4">
+            Frequently Asked Questions
+          </label>
+          <div className="space-y-4 mb-4">
+            <div>
+              <input
+                type="text"
+                value={currentFaqQuestion}
+                onChange={(e) => setCurrentFaqQuestion(e.target.value)}
+                placeholder="Question (e.g., How can I book?)"
+                className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div className="flex gap-2">
+              <textarea
+                value={currentFaqAnswer}
+                onChange={(e) => setCurrentFaqAnswer(e.target.value)}
+                placeholder="Answer (e.g., You can book via WhatsApp...)"
+                rows={2}
+                className="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
+              />
+              <button
+                type="button"
+                onClick={handleAddFaq}
+                className="px-6 bg-primary text-white rounded-lg font-bold hover:opacity-90 transition-opacity self-end"
+              >
+                Add FAQ
+              </button>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {formData.faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 group relative"
+              >
+                <div className="font-bold text-gray-900 dark:text-white pr-8">Q: {faq.question}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">A: {faq.answer}</div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFaq(index)}
+                  className="absolute top-4 right-4 p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="border-t-2 border-border/50 pt-6">
+          <label className="block text-lg font-bold text-gray-900 dark:text-white mb-4">
+            Customer Reviews
+          </label>
+          <div className="space-y-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                value={currentReviewUser}
+                onChange={(e) => setCurrentReviewUser(e.target.value)}
+                placeholder="User Name"
+                className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              />
+              <select
+                value={currentReviewRating}
+                onChange={(e) => setCurrentReviewRating(parseInt(e.target.value))}
+                className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+              >
+                {[5, 4, 3, 2, 1].map(r => (
+                  <option key={r} value={r}>{r} Stars</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <textarea
+                value={currentReviewComment}
+                onChange={(e) => setCurrentReviewComment(e.target.value)}
+                placeholder="Review comment..."
+                rows={2}
+                className="flex-1 px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
+              />
+              <button
+                type="button"
+                onClick={handleAddReview}
+                className="px-6 bg-primary text-white rounded-lg font-bold hover:opacity-90 transition-opacity self-end py-2"
+              >
+                Add Review
+              </button>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {formData.reviews.map((review, index) => (
+              <div
+                key={index}
+                className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 group relative"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <div className="font-bold text-gray-900 dark:text-white pr-8">{review.user}</div>
+                  <div className="text-yellow-500 font-bold">{review.rating} ★</div>
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 italic">"{review.comment}"</div>
+                <div className="text-[10px] text-muted-foreground mt-2">{review.date}</div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveReview(index)}
+                  className="absolute top-4 right-4 p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Features */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -634,7 +864,7 @@ export function AddPujaForm() {
           type="submit"
           className="w-full py-3.5 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
         >
-          Add Puja
+          {editingPuja ? 'Update Puja' : 'Add Puja'}
         </button>
       </form>
     </div>

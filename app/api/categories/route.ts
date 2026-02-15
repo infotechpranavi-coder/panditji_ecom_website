@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
       slug: body.slug || body.name.toLowerCase().replace(/\s+/g, '-'),
       description: body.description || '',
       showOnNavbar: body.showOnNavbar || false,
+      isService: body.isService !== undefined ? body.isService : true,
+      isProduct: body.isProduct !== undefined ? body.isProduct : false,
     })
 
     return NextResponse.json(newCategory, { status: 201 })

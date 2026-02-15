@@ -3,9 +3,31 @@
 import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { ChevronRight, Heart, Users, Award, Flame } from 'lucide-react'
+import { ChevronRight, Heart, Users, Award, Flame, User as UserIcon } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function AboutPage() {
+  const [teamMembers, setTeamMembers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchTeam()
+  }, [])
+
+  const fetchTeam = async () => {
+    try {
+      const response = await fetch('/api/team')
+      if (response.ok) {
+        const data = await response.json()
+        setTeamMembers(data)
+      }
+    } catch (error) {
+      console.error('Error fetching team:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -33,7 +55,7 @@ export default function AboutPage() {
             Bridging <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">Sacred Traditions</span> with Modern Access
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed">
-            Book My Panditji is dedicated to preserving and sharing authentic Indian temple traditions with devotees worldwide, bringing spiritual services into the modern era.
+            Book My Panditji is dedicated to preserving and sharing authentic Indian temple traditions with devotees worldwide through innovative e-puja services, bringing spiritual ceremonies into the digital era.
           </p>
         </div>
       </section>
@@ -48,10 +70,10 @@ export default function AboutPage() {
               </div>
               <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Our Mission</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed text-lg">
-                To make authentic Indian temple rituals, pujas, and spiritual services accessible to everyone, regardless of their location or lifestyle. We believe in the power of traditions and their ability to bring peace, prosperity, and spiritual growth to modern lives.
+                To make authentic Indian temple rituals, pujas, and spiritual services accessible to everyone through e-puja platforms, regardless of their location or lifestyle. We believe in the power of traditions and their ability to bring peace, prosperity, and spiritual growth to modern lives.
               </p>
               <p className="text-muted-foreground leading-relaxed text-lg">
-                Our mission is to serve as a bridge between the ancient wisdom of our traditions and the contemporary needs of devotees seeking spiritual fulfillment.
+                Our mission is to serve as a digital bridge between the ancient wisdom of our traditions and the contemporary needs of devotees seeking spiritual fulfillment through online ceremonies.
               </p>
             </div>
             <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-transparent rounded-2xl p-10 card-elevated border border-accent/20 hover:border-accent/40 transition-all">
@@ -60,10 +82,10 @@ export default function AboutPage() {
               </div>
               <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Our Vision</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed text-lg">
-                To become the most trusted platform for authentic Indian spiritual services, where devotees can experience genuine rituals performed by qualified priests with deep knowledge of Vedic traditions.
+                To become the most trusted e-puja platform for authentic Indian spiritual services, where devotees can experience genuine rituals performed by qualified priests with deep knowledge of Vedic traditions through live virtual ceremonies.
               </p>
               <p className="text-muted-foreground leading-relaxed text-lg">
-                We envision a world where spiritual traditions thrive in the modern age, connecting millions of devotees to their roots and spiritual purpose.
+                We envision a world where spiritual traditions thrive in the digital age, connecting millions of devotees globally to their roots and spiritual purpose through innovative e-puja services.
               </p>
             </div>
           </div>
@@ -150,21 +172,32 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { name: 'Pandit Sharma', role: 'Head Priest & Founder', specialty: 'Vedic Rituals', gradient: 'from-primary/20 to-primary/5' },
-              { name: 'Dr. Ramakrishnan', role: 'Spiritual Guide', specialty: 'Vedic Knowledge', gradient: 'from-accent/20 to-accent/5' },
-              { name: 'Pandit Gupta', role: 'Senior Priest', specialty: 'Havan & Pujas', gradient: 'from-primary/20 to-accent/5' },
-              { name: 'Swami Anand', role: 'Consultant', specialty: 'Astrology & Mantras', gradient: 'from-accent/20 to-primary/5' },
-            ].map((member, idx) => (
-              <div key={idx} className={`bg-gradient-to-br ${member.gradient} rounded-2xl border border-border/50 p-8 text-center card-elevated hover:border-primary/50 transition-all group`}>
-                <div className="w-20 h-20 bg-gradient-to-br from-primary/30 to-accent/20 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl">🙏</span>
-                </div>
-                <h3 className="font-bold text-xl mb-2 group-hover:text-primary transition-colors">{member.name}</h3>
-                <p className="text-sm text-primary font-semibold mb-3">{member.role}</p>
-                <p className="text-sm text-muted-foreground">{member.specialty}</p>
+            {loading ? (
+              <div className="col-span-full flex justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
-            ))}
+            ) : teamMembers.length === 0 ? (
+              <div className="col-span-full text-center py-20 bg-muted/10 rounded-2xl border border-dashed border-border">
+                <p className="text-muted-foreground italic">Meet our dedicated team of spiritual guides and priests coming soon.</p>
+              </div>
+            ) : (
+              teamMembers.map((member, idx) => (
+                <div key={idx} className={`bg-gradient-to-br ${idx % 2 === 0 ? 'from-primary/20 to-primary/5' : 'from-accent/20 to-accent/5'} rounded-2xl border border-border/50 p-8 text-center card-elevated hover:border-primary/50 transition-all group`}>
+                  <div className="w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center overflow-hidden border-2 border-primary shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    {member.image ? (
+                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/30 to-accent/20 flex items-center justify-center">
+                        <span className="text-4xl text-primary/40">🙏</span>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-xl mb-2 group-hover:text-primary transition-colors">{member.name}</h3>
+                  <p className="text-sm text-primary font-semibold mb-3">{member.role}</p>
+                  <p className="text-sm text-muted-foreground">{member.specialty}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

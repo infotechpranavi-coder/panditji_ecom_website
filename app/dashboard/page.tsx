@@ -5,7 +5,11 @@ import { PujaList } from '@/components/dashboard/puja-list'
 import { CustomerBookings } from '@/components/dashboard/customer-bookings'
 import { CategoryManager } from '@/components/dashboard/category-manager'
 import { BannerManager } from '@/components/dashboard/banner-manager'
-import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder, Image } from 'lucide-react'
+import { GalleryManager } from '@/components/dashboard/gallery-manager'
+import { TeamManager } from '@/components/dashboard/team-manager'
+import { AddSamagriForm } from '@/components/dashboard/add-samagri-form'
+import { SamagriManager } from '@/components/dashboard/samagri-manager'
+import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder, Image, ImageIcon, UsersRound, ShoppingBag } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function DashboardPage() {
@@ -15,7 +19,9 @@ export default function DashboardPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'bookings' | 'categories' | 'banners'>('add')
+  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'add-samagri' | 'manage-samagri' | 'bookings' | 'categories' | 'banners' | 'gallery' | 'team'>('add')
+  const [editingPuja, setEditingPuja] = useState<any>(null)
+  const [editingSamagri, setEditingSamagri] = useState<any>(null)
 
   const [stats, setStats] = useState({
     totalPujas: 0,
@@ -253,6 +259,26 @@ export default function DashboardPage() {
             Categories
           </button>
           <button
+            onClick={() => setActiveTab('add-samagri')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'add-samagri'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-primary'
+              }`}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            Add Samagri
+          </button>
+          <button
+            onClick={() => setActiveTab('manage-samagri')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'manage-samagri'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-primary'
+              }`}
+          >
+            <Package className="w-4 h-4" />
+            Manage Samagri
+          </button>
+          <button
             onClick={() => setActiveTab('banners')}
             className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'banners'
               ? 'border-primary text-primary'
@@ -263,6 +289,16 @@ export default function DashboardPage() {
             Hero Banner
           </button>
           <button
+            onClick={() => setActiveTab('gallery')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'gallery'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-primary'
+              }`}
+          >
+            <ImageIcon className="w-4 h-4" />
+            Gallery
+          </button>
+          <button
             onClick={() => setActiveTab('bookings')}
             className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${activeTab === 'bookings'
               ? 'border-primary text-primary'
@@ -271,15 +307,56 @@ export default function DashboardPage() {
           >
             Customer Bookings
           </button>
+          <button
+            onClick={() => setActiveTab('team')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'team'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-primary'
+              }`}
+          >
+            <UsersRound className="w-4 h-4" />
+            Our Team
+          </button>
         </div>
 
         {/* Tab Content */}
         <div>
-          {activeTab === 'add' && <AddPujaForm />}
-          {activeTab === 'manage' && <PujaList />}
+          {activeTab === 'add' && (
+            <AddPujaForm
+              editingPuja={editingPuja}
+              onCancelEdit={() => setEditingPuja(null)}
+            />
+          )}
+          {activeTab === 'manage' && (
+            <PujaList
+              onEdit={(puja) => {
+                setEditingPuja(puja)
+                setActiveTab('add')
+                // Scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+            />
+          )}
           {activeTab === 'categories' && <CategoryManager />}
           {activeTab === 'banners' && <BannerManager />}
+          {activeTab === 'gallery' && <GalleryManager />}
           {activeTab === 'bookings' && <CustomerBookings />}
+          {activeTab === 'team' && <TeamManager />}
+          {activeTab === 'add-samagri' && (
+            <AddSamagriForm
+              editingSamagri={editingSamagri}
+              onCancelEdit={() => setEditingSamagri(null)}
+            />
+          )}
+          {activeTab === 'manage-samagri' && (
+            <SamagriManager
+              onEdit={(samagri) => {
+                setEditingSamagri(samagri)
+                setActiveTab('add-samagri')
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+            />
+          )}
         </div>
       </main>
     </div>

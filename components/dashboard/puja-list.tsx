@@ -19,7 +19,11 @@ interface Puja {
   createdAt: string
 }
 
-export function PujaList() {
+interface PujaListProps {
+  onEdit?: (puja: Puja) => void
+}
+
+export function PujaList({ onEdit }: PujaListProps) {
   const [pujas, setPujas] = useState<Puja[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -68,8 +72,9 @@ export function PujaList() {
   }
 
   const filteredPujas = pujas.filter(puja => {
-    const matchesSearch = puja.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      puja.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = puja.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      puja.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      puja.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = filterCategory === 'all' || puja.category === filterCategory
     return matchesSearch && matchesCategory
   })
@@ -201,7 +206,7 @@ export function PujaList() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => alert('Edit functionality coming soon!')}
+                        onClick={() => onEdit?.(puja)}
                         className="p-2 hover:bg-primary/10 rounded-lg transition-colors"
                         title="Edit"
                       >

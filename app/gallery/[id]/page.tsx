@@ -215,7 +215,7 @@ Our priests ensure that all festival traditions are followed correctly and rever
 export default function ServiceDetailPage() {
   const params = useParams()
   const id = params?.id as string
-  const service = servicesData[id as keyof typeof servicesData]
+  const service = servicesData[Number(id) as keyof typeof servicesData]
   const [quantity, setQuantity] = useState(1)
 
   if (!service) {
@@ -240,7 +240,7 @@ export default function ServiceDetailPage() {
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]')
     const existingItem = cart.find((item: any) => item.id === id)
-    
+
     if (existingItem) {
       existingItem.quantity += quantity
     } else {
@@ -251,9 +251,9 @@ export default function ServiceDetailPage() {
         quantity,
       })
     }
-    
+
     localStorage.setItem('cart', JSON.stringify(cart))
-    
+
     // Update cart count
     const cartCount = document.getElementById('cart-count')
     if (cartCount) {
@@ -346,11 +346,8 @@ export default function ServiceDetailPage() {
             {/* Right - Booking Card */}
             <div className="lg:col-span-1">
               <div className="sticky top-20 bg-card rounded-lg border border-border p-8">
-                <div className="mb-6">
-                  <div className="text-sm text-muted-foreground mb-2">Price</div>
-                  <div className="text-4xl font-bold text-primary mb-2">₹{service.price}</div>
-                  <div className="text-sm text-muted-foreground">⏱️ Duration: {service.duration}</div>
-                </div>
+                <div className="text-sm text-muted-foreground mb-2">Duration</div>
+                <div className="text-2xl font-bold text-primary mb-2">{service.duration}</div>
 
                 <div className="mb-6 border-t border-border pt-6">
                   <label className="block text-sm font-medium mb-3">Quantity</label>
@@ -371,10 +368,7 @@ export default function ServiceDetailPage() {
                   </div>
                 </div>
 
-                <div className="mb-6 p-4 bg-primary/5 rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-2">Total Price</div>
-                  <div className="text-2xl font-bold">₹{service.price * quantity}</div>
-                </div>
+                {/* Total Price Removed */}
 
                 <button
                   onClick={handleAddToCart}

@@ -10,6 +10,8 @@ interface Category {
   slug: string
   description: string
   showOnNavbar?: boolean
+  isService: boolean
+  isProduct: boolean
   createdAt: string
 }
 
@@ -18,7 +20,13 @@ export function CategoryManager() {
   const [loading, setLoading] = useState(true)
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ name: '', description: '', showOnNavbar: false })
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    showOnNavbar: false,
+    isService: true,
+    isProduct: false
+  })
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -31,10 +39,12 @@ export function CategoryManager() {
       const response = await fetch('/api/categories')
       if (response.ok) {
         const data = await response.json()
-        // Ensure all categories have default values for showOnNavbar
+        // Ensure all categories have default values for flags
         const normalizedCategories = data.map((cat: any) => ({
           ...cat,
           showOnNavbar: cat.showOnNavbar === true,
+          isService: cat.isService !== false, // default true
+          isProduct: cat.isProduct === true, // default false
           description: cat.description || '',
           name: cat.name || '',
           id: cat.id || cat._id,
@@ -67,13 +77,30 @@ export function CategoryManager() {
           name: formData.name.trim(),
           description: formData.description.trim(),
           showOnNavbar: formData.showOnNavbar,
+          isService: formData.isService,
+          isProduct: formData.isProduct,
         }),
       })
 
       if (response.ok) {
         const newCategory = await response.json()
-        setCategories([...categories, newCategory])
-        setFormData({ name: '', description: '', showOnNavbar: false })
+        const normalizedNewCategory = {
+          ...newCategory,
+          showOnNavbar: newCategory.showOnNavbar === true,
+          isService: newCategory.isService !== false,
+          isProduct: newCategory.isProduct === true,
+          description: newCategory.description || '',
+          name: newCategory.name || '',
+          id: newCategory.id || newCategory._id,
+        }
+        setCategories([...categories, normalizedNewCategory])
+        setFormData({
+          name: '',
+          description: '',
+          showOnNavbar: false,
+          isService: true,
+          isProduct: false
+        })
         setIsAdding(false)
         setError('')
         alert('Category added successfully!')
@@ -100,13 +127,21 @@ export function CategoryManager() {
           name: formData.name.trim(),
           description: formData.description.trim(),
           showOnNavbar: formData.showOnNavbar,
+          isService: formData.isService,
+          isProduct: formData.isProduct,
         }),
       })
 
       if (response.ok) {
         setCategories(categories.map(c => c.id === id ? { ...c, ...formData } : c))
         setEditingId(null)
-        setFormData({ name: '', description: '', showOnNavbar: false })
+        setFormData({
+          name: '',
+          description: '',
+          showOnNavbar: false,
+          isService: true,
+          isProduct: false
+        })
         setError('')
         alert('Category updated successfully!')
       } else {
@@ -119,7 +154,7 @@ export function CategoryManager() {
   }
 
   const handleDeleteCategory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category? Services under this category will need to be reassigned.')) {
+    if (!confirm('Are you sure you want to delete this category? Services/Products under this category will need to be reassigned.')) {
       return
     }
 
@@ -145,7 +180,9 @@ export function CategoryManager() {
     setFormData({
       name: category.name || '',
       description: category.description || '',
-      showOnNavbar: category.showOnNavbar === true
+      showOnNavbar: category.showOnNavbar === true,
+      isService: category.isService !== false,
+      isProduct: category.isProduct === true
     })
     setIsAdding(false)
   }
@@ -153,7 +190,13 @@ export function CategoryManager() {
   const cancelEditing = () => {
     setEditingId(null)
     setIsAdding(false)
-    setFormData({ name: '', description: '', showOnNavbar: false })
+    setFormData({
+      name: '',
+      description: '',
+      showOnNavbar: false,
+      isService: true,
+      isProduct: false
+    })
     setError('')
   }
 
@@ -180,7 +223,13 @@ export function CategoryManager() {
             onClick={() => {
               setIsAdding(true)
               setEditingId(null)
-              setFormData({ name: '', description: '', showOnNavbar: false })
+              setFormData({
+                name: '',
+                description: '',
+                showOnNavbar: false,
+                isService: true,
+                isProduct: false
+              })
               setError('')
             }}
             className="px-4 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center gap-2"
@@ -228,17 +277,43 @@ export function CategoryManager() {
                 className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
               />
             </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="showOnNavbar"
-                checked={formData.showOnNavbar === true}
-                onChange={(e) => setFormData({ ...formData, showOnNavbar: e.target.checked })}
-                className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
-              />
-              <label htmlFor="showOnNavbar" className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
-                Show on Navbar
-              </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-900 p-4 rounded-xl border border-border">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="showOnNavbar"
+                  checked={formData.showOnNavbar === true}
+                  onChange={(e) => setFormData({ ...formData, showOnNavbar: e.target.checked })}
+                  className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                />
+                <label htmlFor="showOnNavbar" className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Show on Navbar
+                </label>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="isService"
+                  checked={formData.isService === true}
+                  onChange={(e) => setFormData({ ...formData, isService: e.target.checked })}
+                  className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="isService" className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Ritual Service
+                </label>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="isProduct"
+                  checked={formData.isProduct === true}
+                  onChange={(e) => setFormData({ ...formData, isProduct: e.target.checked })}
+                  className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                />
+                <label htmlFor="isProduct" className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Samagri Product
+                </label>
+              </div>
             </div>
             <div className="flex gap-3">
               <button
@@ -289,17 +364,43 @@ export function CategoryManager() {
                     rows={2}
                     className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
                   />
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id={`showOnNavbar-${category.id}`}
-                      checked={formData.showOnNavbar === true}
-                      onChange={(e) => setFormData({ ...formData, showOnNavbar: e.target.checked })}
-                      className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
-                    />
-                    <label htmlFor={`showOnNavbar-${category.id}`} className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
-                      Show on Navbar
-                    </label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-border">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id={`showOnNavbar-${category.id}`}
+                        checked={formData.showOnNavbar === true}
+                        onChange={(e) => setFormData({ ...formData, showOnNavbar: e.target.checked })}
+                        className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                      />
+                      <label htmlFor={`showOnNavbar-${category.id}`} className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                        On Navbar
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id={`isService-${category.id}`}
+                        checked={formData.isService === true}
+                        onChange={(e) => setFormData({ ...formData, isService: e.target.checked })}
+                        className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <label htmlFor={`isService-${category.id}`} className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                        Ritual
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id={`isProduct-${category.id}`}
+                        checked={formData.isProduct === true}
+                        onChange={(e) => setFormData({ ...formData, isProduct: e.target.checked })}
+                        className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                      />
+                      <label htmlFor={`isProduct-${category.id}`} className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                        Samagri
+                      </label>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -327,13 +428,23 @@ export function CategoryManager() {
                         {category.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-3 mt-2">
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
                       <p className="text-xs text-gray-500 dark:text-gray-500">
                         Slug: {category.slug}
                       </p>
                       {category.showOnNavbar && (
-                        <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-semibold">
-                          On Navbar
+                        <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary rounded-full font-bold uppercase tracking-widest border border-primary/20">
+                          Navbar
+                        </span>
+                      )}
+                      {category.isService && (
+                        <span className="text-[10px] px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full font-bold uppercase tracking-widest border border-blue-200 dark:border-blue-800">
+                          Ritual
+                        </span>
+                      )}
+                      {category.isProduct && (
+                        <span className="text-[10px] px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full font-bold uppercase tracking-widest border border-orange-200 dark:border-orange-800">
+                          Samagri
                         </span>
                       )}
                     </div>

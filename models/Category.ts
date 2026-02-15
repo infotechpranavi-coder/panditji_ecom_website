@@ -6,6 +6,8 @@ export interface ICategory extends Document {
     slug: string;
     description?: string;
     showOnNavbar?: boolean;
+    isService: boolean;
+    isProduct: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -17,6 +19,8 @@ const CategorySchema: Schema = new Schema(
         slug: { type: String, required: true, unique: true },
         description: { type: String, default: '' },
         showOnNavbar: { type: Boolean, default: false },
+        isService: { type: Boolean, default: true },
+        isProduct: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

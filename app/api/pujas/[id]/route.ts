@@ -43,6 +43,40 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await dbConnect()
+    const { id } = await context.params
+    const body = await request.json()
+
+    console.log(`Updating puja with ID: ${id}`)
+
+    // Try finding by MongoDB ObjectID first
+    let puja = null
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      puja = await Puja.findByIdAndUpdate(id, body, { new: true, runValidators: true }).catch(() => null)
+    }
+
+    // If not found by ObjectID, try the custom 'id' field
+    if (!puja) {
+      puja = await Puja.findOneAndUpdate({ id: id }, body, { new: true, runValidators: true })
+    }
+
+    if (!puja) {
+      return NextResponse.json({ error: 'Puja not found' }, { status: 404 })
+    }
+
+    console.log(`Successfully updated puja: ${puja.name}`)
+    return NextResponse.json(puja)
+  } catch (error) {
+    console.error('Error updating puja:', error)
+    return NextResponse.json({ error: 'Failed to update puja' }, { status: 500 })
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

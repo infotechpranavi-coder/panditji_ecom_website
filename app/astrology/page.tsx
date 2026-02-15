@@ -330,13 +330,14 @@ export default function AstrologyPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div className="p-5 flex-1 flex flex-col bg-white dark:bg-card">
-                    <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-2">
+                    <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-1">
                       {product.name}
                     </h3>
+                    <p className="text-xs text-muted-foreground mb-4 line-clamp-2">
+                      Sacred ritual for spiritual growth and divine blessings.
+                    </p>
                     <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-                      <span className="text-xl font-extrabold text-gray-900 dark:text-primary">
-                        ₹{product.price.toLocaleString('en-IN')}
-                      </span>
+                      <span className="text-sm font-bold text-primary">View Details</span>
                       <div className="p-2.5 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
                         <ChevronRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
                       </div>

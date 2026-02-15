@@ -109,7 +109,7 @@ export default function Home() {
               <div className="space-y-6 max-w-4xl mx-auto">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-4 animate-fade-in">
                   <Sparkles className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-bold text-white">Authentic Spiritual Services</span>
+                  <span className="text-sm font-bold text-white">Online Puja & e-Puja Services</span>
                 </div>
 
                 {heroBanner.title && (
@@ -155,7 +155,7 @@ export default function Home() {
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-sm rounded-full border border-primary/20 shadow-lg">
                   <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                  <span className="text-sm font-bold text-primary">✨ Authentic Traditional Services</span>
+                  <span className="text-sm font-bold text-primary">✨ Online e-Puja Services</span>
                 </div>
 
                 {/* Main Heading */}
@@ -167,7 +167,7 @@ export default function Home() {
                     </span>
                   </h1>
                   <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
-                    Book authentic puja services performed by certified priests. Experience sacred rituals from anywhere, anytime.
+                    Book authentic e-puja and online puja services performed by certified priests. Experience sacred rituals from anywhere, anytime.
                   </p>
                 </div>
 
@@ -279,19 +279,15 @@ export default function Home() {
                       )}
                     </div>
                     <div className="p-6 flex-1 flex flex-col bg-white dark:bg-card">
-                      <h3 className="font-bold text-lg mb-3 text-primary group-hover:text-accent transition-colors line-clamp-2 min-h-[3.5rem]">
+                      <h3 className="font-bold text-lg mb-2 text-primary group-hover:text-accent transition-colors line-clamp-1">
                         {service.name}
                       </h3>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[2.5rem]">
+                        {service.shortDescription || 'Experience the divine blessings of this sacred puja ritual'}
+                      </p>
                       <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-                        <div className="flex items-baseline gap-1">
-                          {service.priceLabel && (
-                            <span className="text-xs text-muted-foreground font-medium">From:</span>
-                          )}
-                          <span className="text-xl font-extrabold text-gray-900 dark:text-primary">
-                            ₹{service.price.toLocaleString('en-IN')}
-                          </span>
-                        </div>
-                        <div className="p-2.5 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
+                        <span className="text-sm font-bold text-primary">View Details</span>
+                        <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
                           <ArrowRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
                         </div>
                       </div>
@@ -384,9 +380,7 @@ export default function Home() {
                             {(largeCard.shortDescription || largeCard.description || '').split(' ').length > 4 ? '...' : ''}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                              ₹{largeCard.price.toLocaleString('en-IN')}
-                            </span>
+                            <span className="text-sm font-bold text-primary">View Details</span>
                             <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary group-hover:text-white transition-all">
                               <ArrowRight className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
                             </div>
@@ -411,20 +405,16 @@ export default function Home() {
                           <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="p-5 flex-1 flex flex-col">
-                          <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-2">
+                          <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-1">
                             {smallCard1.name}
                           </h3>
-                          <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-                            <div className="flex items-baseline gap-1">
-                              {smallCard1.priceLabel && (
-                                <span className="text-xs text-muted-foreground">From:</span>
-                              )}
-                              <span className="text-xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                                ₹{smallCard1.price.toLocaleString('en-IN')}
-                              </span>
-                            </div>
-                            <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
-                              <ArrowRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
+                          <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
+                            {smallCard1.shortDescription || smallCard1.name || 'Sacred traditional puja celebration'}
+                          </p>
+                          <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
+                            <span className="text-xs font-bold text-primary">View Details</span>
+                            <div className="p-1.5 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
+                              <ArrowRight className="w-3.5 h-3.5 text-primary group-hover:text-white transition-colors" />
                             </div>
                           </div>
                         </div>
@@ -447,20 +437,16 @@ export default function Home() {
                           <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="p-5 flex-1 flex flex-col">
-                          <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-2">
+                          <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-1">
                             {smallCard2.name}
                           </h3>
-                          <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-                            <div className="flex items-baseline gap-1">
-                              {smallCard2.priceLabel && (
-                                <span className="text-xs text-muted-foreground">From:</span>
-                              )}
-                              <span className="text-xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                                ₹{smallCard2.price.toLocaleString('en-IN')}
-                              </span>
-                            </div>
-                            <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
-                              <ArrowRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
+                          <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
+                            {smallCard2.shortDescription || 'Experience authentic Vedic traditions'}
+                          </p>
+                          <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
+                            <span className="text-xs font-bold text-primary">View Details</span>
+                            <div className="p-1.5 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
+                              <ArrowRight className="w-3.5 h-3.5 text-primary group-hover:text-white transition-colors" />
                             </div>
                           </div>
                         </div>
@@ -572,13 +558,14 @@ export default function Home() {
                       )}
                     </div>
                     <div className={`${isLarge ? 'p-6' : 'p-5'} bg-white dark:bg-card`}>
-                      <h3 className={`font-bold ${isLarge ? 'text-xl' : 'text-lg'} mb-3 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-2`}>
+                      <h3 className={`font-bold ${isLarge ? 'text-xl' : 'text-lg'} mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1`}>
                         {service.name}
                       </h3>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        {service.shortDescription || 'Authentic traditional rituals performed by experts'}
+                      </p>
                       <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                        <span className={`font-extrabold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent ${isLarge ? 'text-2xl' : 'text-xl'}`}>
-                          ₹{service.price.toLocaleString('en-IN')}
-                        </span>
+                        <span className="text-sm font-bold text-accent">View Details</span>
                         <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
                           <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
                         </div>
@@ -632,9 +619,7 @@ export default function Home() {
                       {service.name}
                     </h3>
                     <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-                      <span className="text-xl font-extrabold text-gray-900 dark:text-primary">
-                        ₹{service.price.toLocaleString('en-IN')}
-                      </span>
+                      <span className="text-sm font-bold text-primary">View Details</span>
                       <div className="p-2.5 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
                         <ArrowRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
                       </div>

@@ -103,7 +103,7 @@ export default function ContactPage() {
                         Contact Us
                     </h1>
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        Have questions about our puja services? Reach out to us for spiritual guidance and authentic traditional rituals.
+                        Have questions about our e-puja services? Reach out to us for spiritual guidance and authentic traditional online rituals.
                     </p>
                 </div>
             </section>
@@ -148,8 +148,11 @@ export default function ContactPage() {
                             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
                                 Send us a <span className="text-primary">Message</span>
                             </h2>
-                            <p className="text-lg text-muted-foreground leading-relaxed max-w-md">
-                                Whether you need to book a special puja or have a spiritual inquiry, our team is here to help you connect with your traditions.
+                            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                                Whether you need guidance on e-puja services, want to book a virtual ceremony, or have questions about our online spiritual offerings, we're here to help.
+                            </p>
+                            <p className="text-lg text-muted-foreground leading-relaxed">
+                                Our team of experienced pandits is available to assist you with personalized e-puja services from the comfort of your home.
                             </p>
                         </div>
 
