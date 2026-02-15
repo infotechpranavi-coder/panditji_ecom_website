@@ -2,8 +2,8 @@
 
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { Search, Filter, ArrowRight, Sparkles, ChevronRight, LayoutGrid, Heart } from 'lucide-react'
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { Search, ArrowRight, Sparkles } from 'lucide-react'
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -28,7 +28,7 @@ interface Puja {
     discount?: number
 }
 
-export default function ServicesPage() {
+function ServicesContent() {
     const searchParams = useSearchParams()
     const initialCategory = searchParams.get('category') || 'all'
 
@@ -44,7 +44,6 @@ export default function ServicesPage() {
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                // When hero is NOT intersecting (out of view), show sticky
                 setShowSticky(!entry.isIntersecting)
             },
             { threshold: 0 }
@@ -82,7 +81,6 @@ export default function ServicesPage() {
                 const categoriesData = await categoriesRes.json()
 
                 setPujas(pujasData.map((p: any) => ({ ...p, id: p.id || p._id })))
-                // Filter to show only service categories
                 setCategories(categoriesData.filter((cat: any) => cat.isService !== false))
             }
         } catch (error) {
@@ -107,7 +105,7 @@ export default function ServicesPage() {
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
             <Navbar />
 
-            {/* Hero Section - Matching Homepage Style */}
+            {/* Hero Section */}
             <section ref={heroRef} id="hero-section" className="bg-white dark:bg-slate-900 border-b border-border py-12 px-4 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,100,0,0.05),transparent_50%)]" />
                 <div className="mx-auto max-w-7xl relative z-10">
@@ -165,7 +163,7 @@ export default function ServicesPage() {
                 </div>
             </section>
 
-            {/* Default Category Bar (Non-sticky, visible when at top) */}
+            {/* Default Category Bar */}
             {!showSticky && (
                 <div className="bg-white dark:bg-slate-900 border-b border-border">
                     <div className="mx-auto max-w-7xl px-4 py-4 flex gap-3 overflow-x-auto scrollbar-hide">
@@ -194,12 +192,10 @@ export default function ServicesPage() {
                 </div>
             )}
 
-            {/* Sticky Navigation Bar - Combines Categories & Search (Visible only during scroll) */}
-            {/* The offset exactly matches the Navbar height (40px + 80px + 48px = 168px) */}
+            {/* Sticky Navigation Bar */}
             <div className={`bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-border sticky top-[168px] z-40 shadow-sm transition-all duration-500 transform ${showSticky ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0 pointer-events-none'}`}>
                 <div className="mx-auto max-w-7xl px-4 py-3">
                     <div className="flex flex-col lg:flex-row items-center gap-4">
-                        {/* Categories (Scrollable horizontally) */}
                         <div className="flex-1 overflow-x-auto scrollbar-hide w-full">
                             <div className="flex gap-2">
                                 <button
@@ -226,7 +222,6 @@ export default function ServicesPage() {
                             </div>
                         </div>
 
-                        {/* Integrated Search Bar */}
                         <div className="w-full lg:w-72">
                             <div className="relative group">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
@@ -243,7 +238,7 @@ export default function ServicesPage() {
                 </div>
             </div>
 
-            {/* Main Grid Section - Matching Homepage layout */}
+            {/* Main Grid Section */}
             <main className="flex-1 px-4 py-16">
                 <div className="mx-auto max-w-7xl">
                     {loading ? (
@@ -254,49 +249,47 @@ export default function ServicesPage() {
                         </div>
                     ) : filteredPujas.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {filteredPujas.map((service, index) => {
-                                return (
-                                    <Link
-                                        key={service.id}
-                                        href={`/puja/${service.id}`}
-                                        className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-300 relative"
-                                    >
-                                        {service.discount && (
-                                            <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
-                                                -{service.discount}%
-                                            </div>
+                            {filteredPujas.map((service) => (
+                                <Link
+                                    key={service.id}
+                                    href={`/puja/${service.id}`}
+                                    className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-300 relative"
+                                >
+                                    {service.discount && (
+                                        <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
+                                            -{service.discount}%
+                                        </div>
+                                    )}
+                                    <div className="relative h-48 bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden">
+                                        {service.image && service.image !== '/placeholder.jpg' ? (
+                                            <img
+                                                src={service.image}
+                                                alt={service.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            />
+                                        ) : (
+                                            <>
+                                                <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                                            </>
                                         )}
-                                        <div className="relative h-48 bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden">
-                                            {service.image && service.image !== '/placeholder.jpg' ? (
-                                                <img
-                                                    src={service.image}
-                                                    alt={service.name}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                />
-                                            ) : (
-                                                <>
-                                                    <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                                                </>
-                                            )}
-                                        </div>
-                                        <div className="p-6 bg-white dark:bg-card">
-                                            <h3 className="font-black text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1">
-                                                {service.name}
-                                            </h3>
-                                            <p className="text-sm text-muted-foreground mb-6 line-clamp-2 font-medium">
-                                                {service.shortDescription || service.description || 'Authentic traditional rituals performed with devotion and Vedic accuracy.'}
-                                            </p>
-                                            <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                                                <span className="text-xs font-black text-accent uppercase tracking-widest">View Details</span>
-                                                <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
-                                                    <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
-                                                </div>
+                                    </div>
+                                    <div className="p-6 bg-white dark:bg-card">
+                                        <h3 className="font-black text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1">
+                                            {service.name}
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground mb-6 line-clamp-2 font-medium">
+                                            {service.shortDescription || service.description || 'Authentic traditional rituals performed with devotion and Vedic accuracy.'}
+                                        </p>
+                                        <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                                            <span className="text-xs font-black text-accent uppercase tracking-widest">View Details</span>
+                                            <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
+                                                <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
                                             </div>
                                         </div>
-                                    </Link>
-                                )
-                            })}
+                                    </div>
+                                </Link>
+                            ))}
                         </div>
                     ) : (
                         <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-border p-20 text-center">
@@ -320,5 +313,22 @@ export default function ServicesPage() {
 
             <Footer />
         </div>
+    )
+}
+
+export default function ServicesPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <Navbar />
+                <div className="flex-1 flex flex-col items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <p className="mt-4 text-slate-500 font-bold">Loading divine services...</p>
+                </div>
+                <Footer />
+            </div>
+        }>
+            <ServicesContent />
+        </Suspense>
     )
 }
