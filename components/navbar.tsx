@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown, MapPin, Languages } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { AuthModal } from './auth-modal'
 
 interface Category {
@@ -25,6 +26,13 @@ export function Navbar() {
   const [selectedLanguage, setSelectedLanguage] = useState('')
   const [isCityOpen, setIsCityOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
+  const router = useRouter()
+
+  const handlePujaSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      router.push(`/services?search=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
 
   const cities = [
     'Mumbai', 'Pune', 'Prayag', 'Delhi', 'Hyderabad',
@@ -116,7 +124,7 @@ export function Navbar() {
                 <div className="flex items-end gap-3">
                   {/* City Selector */}
                   <div className="flex-1 flex flex-col gap-1.5 min-w-0">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1">Perform Pooja in</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">Perform Pooja in</span>
                     <div className="relative">
                       <button
                         onClick={() => { setIsCityOpen(!isCityOpen); setIsLangOpen(false); }}
@@ -170,8 +178,8 @@ export function Navbar() {
                   </div>
 
                   {/* Language Selector */}
-                  <div className="w-48 flex flex-col gap-1.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1">Priest Preference</span>
+                  <div className="w-44 flex flex-col gap-1.5 flex-shrink-0">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">Priest Preference</span>
                     <div className="relative">
                       <button
                         onClick={() => { setIsLangOpen(!isLangOpen); setIsCityOpen(false); }}
@@ -180,7 +188,7 @@ export function Navbar() {
                         <div className="flex items-center gap-2 truncate">
                           <Languages className="w-4 h-4 text-primary flex-shrink-0" />
                           <span className={`${!selectedLanguage ? 'text-muted-foreground italic' : ''} truncate`}>
-                            {selectedLanguage || 'Choose Language'}
+                            {selectedLanguage || 'Choose Lang'}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
@@ -211,6 +219,21 @@ export function Navbar() {
                     </div>
                   </div>
 
+                  {/* Puja Text Search Input */}
+                  <div className="flex-[1.2] flex flex-col gap-1.5 min-w-0">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">Search Puja Services</span>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        placeholder="Search... (Press Enter)"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={handlePujaSearch}
+                        className="w-full pl-10 pr-4 py-2 border-2 border-border rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-card text-sm font-medium placeholder:text-muted-foreground/60 transition-colors h-10"
+                      />
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="relative w-full">

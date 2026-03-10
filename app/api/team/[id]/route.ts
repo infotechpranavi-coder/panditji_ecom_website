@@ -4,12 +4,13 @@ import TeamMember from '@/models/TeamMember';
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
+        const { id } = await context.params;
         const body = await request.json();
-        const member = await TeamMember.findByIdAndUpdate(params.id, body, { new: true });
+        const member = await TeamMember.findByIdAndUpdate(id, body, { new: true });
         if (!member) {
             return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
         }
@@ -21,11 +22,12 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
-        const member = await TeamMember.findByIdAndDelete(params.id);
+        const { id } = await context.params;
+        const member = await TeamMember.findByIdAndDelete(id);
         if (!member) {
             return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
         }

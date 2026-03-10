@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { WhatsAppButton } from '@/components/whatsapp-button'
-import { ChevronRight, Calendar, Clock, MapPin, Mail, Phone, Search, Heart, MessageSquare } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronRight, Calendar, Clock, MapPin, Mail, Phone, Search, Heart, MessageSquare, ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function AstrologyPage() {
   const [formData, setFormData] = useState({
@@ -21,6 +21,27 @@ export default function AstrologyPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [recommendedPujas, setRecommendedPujas] = useState<any[]>([])
+
+  useEffect(() => {
+    const fetchPujas = async () => {
+      try {
+        const response = await fetch('/api/pujas')
+        if (response.ok) {
+          const data = await response.json()
+          // Take first 3 pujas as recommendations and normalize IDs
+          const normalized = data.slice(0, 3).map((p: any) => ({
+            ...p,
+            id: p.id || p._id
+          }))
+          setRecommendedPujas(normalized)
+        }
+      } catch (error) {
+        console.error('Error fetching pujas:', error)
+      }
+    }
+    fetchPujas()
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -35,13 +56,6 @@ export default function AstrologyPage() {
     setIsSubmitting(true)
 
     try {
-      // TODO: Replace with actual API call to save the prediction request
-      // const response = await fetch('/api/astrology-requests', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData),
-      // })
-
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
 
@@ -67,28 +81,6 @@ export default function AstrologyPage() {
     }
   }
 
-  // Sample products for "You May Also Like" section
-  const recommendedProducts = [
-    {
-      id: 1,
-      name: 'Ganesh Chaturthi Puja',
-      price: 4500,
-      image: '/placeholder.jpg',
-      discount: 17,
-    },
-    {
-      id: 2,
-      name: 'Lakshmi Puja',
-      price: 5500,
-      image: '/placeholder.jpg',
-    },
-    {
-      id: 3,
-      name: 'Satyanarayan Puja',
-      price: 3500,
-      image: '/placeholder.jpg',
-    },
-  ]
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -310,20 +302,20 @@ export default function AstrologyPage() {
           <div className="mb-12">
             <h2 className="text-2xl font-extrabold text-primary mb-6">You May Also Like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendedProducts.map((product) => (
+              {recommendedPujas.map((puja) => (
                 <Link
-                  key={product.id}
-                  href={`/puja/${product.id}`}
+                  key={puja.id}
+                  href={`/puja/${puja.id}`}
                   className="group bg-white dark:bg-card rounded-xl border-2 border-border/50 overflow-hidden card-elevated hover:border-primary/70 hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
                   <div className="relative h-48 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 flex items-center justify-center overflow-hidden">
-                    {product.discount && (
+                    {puja.discount > 0 && (
                       <div className="absolute top-3 right-3 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
-                        -{product.discount}%
+                        -{puja.discount}%
                       </div>
                     )}
-                    {product.image && product.image !== '/placeholder.jpg' ? (
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    {puja.image && puja.image !== '/placeholder.jpg' ? (
+                      <img src={puja.image} alt={puja.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                     ) : (
                       <div className="text-7xl opacity-30 group-hover:scale-110 transition-transform duration-300">🙏</div>
                     )}
@@ -331,15 +323,15 @@ export default function AstrologyPage() {
                   </div>
                   <div className="p-5 flex-1 flex flex-col bg-white dark:bg-card">
                     <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-1">
-                      {product.name}
+                      {puja.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground mb-4 line-clamp-2">
-                      Sacred ritual for spiritual growth and divine blessings.
+                    <p className="text-xs text-muted-foreground mb-4 line-clamp-2 font-medium">
+                      {puja.shortDescription || puja.description || 'Sacred ritual for spiritual growth and divine blessings.'}
                     </p>
                     <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
-                      <span className="text-sm font-bold text-primary">View Details</span>
-                      <div className="p-2.5 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
-                        <ChevronRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
+                      <span className="text-xs font-black text-primary uppercase tracking-widest">View Details</span>
+                      <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-all">
+                        <ArrowRight className="w-4 h-4 text-primary group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </div>

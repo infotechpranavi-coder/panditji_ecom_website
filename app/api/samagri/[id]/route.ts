@@ -4,11 +4,12 @@ import Samagri from '@/models/Samagri'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect()
-        const samagri = await Samagri.findById(params.id)
+        const { id } = await context.params
+        const samagri = await Samagri.findById(id)
         if (!samagri) {
             return NextResponse.json({ error: 'Samagri not found' }, { status: 404 })
         }
@@ -20,13 +21,14 @@ export async function GET(
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect()
+        const { id } = await context.params
         const body = await request.json()
         const updatedSamagri = await Samagri.findByIdAndUpdate(
-            params.id,
+            id,
             { ...body, updatedAt: new Date() },
             { new: true }
         )
@@ -41,11 +43,12 @@ export async function PATCH(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect()
-        const deletedSamagri = await Samagri.findByIdAndDelete(params.id)
+        const { id } = await context.params
+        const deletedSamagri = await Samagri.findByIdAndDelete(id)
         if (!deletedSamagri) {
             return NextResponse.json({ error: 'Samagri not found' }, { status: 404 })
         }

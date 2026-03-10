@@ -8,56 +8,58 @@ export function Footer() {
       name: 'Mumbai',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Mumbai' },
-        { lang: 'Tamil', text: 'Tamil Vadhyars in Mumbai' },
-        { lang: 'Telugu', text: 'Telugu Purohits in Mumbai' },
-        { lang: 'Kannada', text: 'Kannada Pujari in Mumbai' },
-        { lang: 'Malayalam', text: 'Malayalam Pandits in Mumbai' },
+        { lang: 'Marathi', text: 'Marathi Guruji in Mumbai' },
+        { lang: 'Odiya', text: 'Odiya Pandits in Mumbai' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins in Mumbai' },
       ]
     },
     {
       name: 'Pune',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Pune' },
-        { lang: 'Tamil', text: 'Tamil Vadhyars in Pune' },
-        { lang: 'Telugu', text: 'Telugu Purohits in Pune' },
         { lang: 'Marathi', text: 'Marathi Guruji in Pune' },
+        { lang: 'Odiya', text: 'Odiya Pandits in Pune' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins in Pune' },
       ]
     },
     {
       name: 'Delhi',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Delhi' },
-        { lang: 'Tamil', text: 'Tamil Vadhyars in Delhi' },
-        { lang: 'Telugu', text: 'Telugu Purohits in Delhi' },
+        { lang: 'Odiya', text: 'Odiya Pandits in Delhi' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins in Delhi' },
       ]
     },
     {
       name: 'Hyderabad',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Hyderabad' },
-        { lang: 'Telugu', text: 'Telugu Purohits in Hyderabad' },
-        { lang: 'Tamil', text: 'Tamil Vadhyars in Hyderabad' },
+        { lang: 'Odiya', text: 'Odiya Pandits in Hyderabad' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins in Hyderabad' },
       ]
     },
     {
       name: 'Prayag',
       pandits: [
-        { lang: 'Hindi', text: 'Sacred Rituals in Prayag' },
-        { lang: 'Hindi', text: 'Triveni Sangam Puja' },
+        { lang: 'Hindi', text: 'Hindi Pandits in Prayag' },
+        { lang: 'Odiya', text: 'Odiya Pandits in Prayag' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins in Prayag' },
       ]
     },
     {
       name: 'Benaras Kashi',
       pandits: [
-        { lang: 'Hindi', text: 'Ganga Aarti Services' },
-        { lang: 'Hindi', text: 'Kashi Vishwanath Puja' },
+        { lang: 'Hindi', text: 'Hindi Pandits in Kashi' },
+        { lang: 'Odiya', text: 'Odiya Pandits in Kashi' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins in Kashi' },
       ]
     },
     {
       name: '12 Jyotirlingas',
       pandits: [
-        { lang: 'Hindi', text: 'Rudraabhiashek Services' },
-        { lang: 'Hindi', text: 'Special Jyotirlinga Puja' },
+        { lang: 'Hindi', text: 'Hindi Pandits for Jyotirlinga' },
+        { lang: 'Odiya', text: 'Odiya Pandits for Jyotirlinga' },
+        { lang: 'Gujrati', text: 'Gujrati Brahmins for Jyotirlinga' },
       ]
     },
   ]

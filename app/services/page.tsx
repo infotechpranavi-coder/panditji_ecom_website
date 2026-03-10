@@ -31,12 +31,13 @@ interface Puja {
 function ServicesContent() {
     const searchParams = useSearchParams()
     const initialCategory = searchParams.get('category') || 'all'
+    const initialSearch = searchParams.get('search') || ''
 
     const [pujas, setPujas] = useState<Puja[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCategory, setSelectedCategory] = useState(initialCategory)
-    const [searchQuery, setSearchQuery] = useState('')
+    const [searchQuery, setSearchQuery] = useState(initialSearch)
 
     const heroRef = useRef<HTMLElement>(null)
     const [showSticky, setShowSticky] = useState(false)
@@ -67,6 +68,8 @@ function ServicesContent() {
     useEffect(() => {
         const cat = searchParams.get('category')
         if (cat) setSelectedCategory(cat)
+        const q = searchParams.get('search')
+        if (q !== null) setSearchQuery(q)
     }, [searchParams])
 
     const fetchData = async () => {
