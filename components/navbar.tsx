@@ -84,14 +84,6 @@ export function Navbar() {
               </Link>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                href="/hindu-calendar"
-                className="flex items-center gap-1.5 px-3 py-1 hover:bg-primary/10 rounded-full transition-all group border border-transparent hover:border-primary/20"
-              >
-                <div className="w-5 h-5 truncate bg-primary/20 flex items-center justify-center rounded-sm">📅</div>
-                <span className="font-bold text-[11px] group-hover:text-primary transition-colors">Hindu Calendar</span>
-              </Link>
-              <div className="h-4 w-px bg-border/50 mx-1 hidden sm:block"></div>
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <span className="font-bold text-[10px] uppercase tracking-widest">Language: Coming Soon</span>
               </div>

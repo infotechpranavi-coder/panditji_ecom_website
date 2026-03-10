@@ -156,14 +156,14 @@ export default function GalleryPage() {
       <section className="flex-1 px-4 py-12 pt-8">
         <div className="mx-auto max-w-7xl">
           {/* Category Filter */}
-          <div className="mb-12 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-3 pb-2 justify-center">
+          <div className="mb-8 md:mb-12 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex gap-2 sm:gap-3 pb-2 justify-start sm:justify-center">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-8 py-3.5 rounded-2xl font-bold whitespace-nowrap transition-all duration-300 ${selectedCategory === cat
-                    ? 'bg-gradient-to-r from-primary to-accent text-white shadow-2xl shadow-primary/50 scale-110 -translate-y-1'
+                  className={`px-4 sm:px-8 py-2 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold whitespace-nowrap transition-all duration-300 text-sm sm:text-base ${selectedCategory === cat
+                    ? 'bg-gradient-to-r from-primary to-accent text-white shadow-xl sm:shadow-2xl shadow-primary/50 scale-105 sm:scale-110 -translate-y-1'
                     : 'bg-white dark:bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border-2 border-border hover:border-primary/50 hover:shadow-lg hover:scale-105'
                     }`}
                 >

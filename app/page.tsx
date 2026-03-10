@@ -93,18 +93,18 @@ export default function Home() {
       {/* Hero Section - Conditional Rendering */}
       {heroBanner ? (
         // Dynamic Hero Banner
-        <section className="relative min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
+        <section className="relative min-h-[220px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
+          {/* Background Image - Made Clickable */}
+          <Link href="/services" className="absolute inset-0 z-0">
             <img
               src={heroBanner.imageUrl}
               alt={heroBanner.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
             />
             {/* Overlay removed as per user request */}
-          </div>
+          </Link>
 
-          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pt-8 pb-8 md:pt-20 md:pb-16">
             {(heroBanner.title || heroBanner.description) && (
               <div className="space-y-6 max-w-4xl mx-auto">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-4 animate-fade-in">
@@ -113,13 +113,13 @@ export default function Home() {
                 </div>
 
                 {heroBanner.title && (
-                  <h1 className="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-lg tracking-tight mb-6">
+                  <h1 className="text-3xl md:text-7xl font-black text-white leading-tight drop-shadow-lg tracking-tight mb-4">
                     {heroBanner.title}
                   </h1>
                 )}
 
                 {heroBanner.description && (
-                  <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md mb-8">
+                  <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md mb-6">
                     {heroBanner.description}
                   </p>
                 )}
@@ -160,13 +160,13 @@ export default function Home() {
 
                 {/* Main Heading */}
                 <div className="space-y-4">
-                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight">
+                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight">
                     Connect with{' '}
                     <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
                       Divine Traditions
                     </span>
                   </h1>
-                  <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
+                  <p className="text-lg md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
                     Book authentic e-puja and online puja services performed by certified priests. Experience sacred rituals from anywhere, anytime.
                   </p>
                 </div>
@@ -245,18 +245,18 @@ export default function Home() {
 
       {/* Latest Puja Section - Professional Title Design */}
       {displayLatestPujas.length > 0 && (
-        <section className="px-4 py-16 relative overflow-hidden bg-gradient-to-b from-background to-muted/20">
+        <section className="px-4 py-10 md:py-16 relative overflow-hidden bg-gradient-to-b from-background to-muted/20">
           <div className="mx-auto max-w-7xl relative z-10">
             {/* Professional Section Header */}
-            <div className="mb-12">
+            <div className="mb-8 md:mb-12">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-1 w-12 bg-gradient-to-r from-red-600 to-red-500 rounded-full" />
                 <span className="text-xs font-bold text-red-600 uppercase tracking-wider">Latest</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
+              <h2 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
                 LATEST PUJA
               </h2>
-              <p className="text-lg text-muted-foreground">Discover our newest puja services</p>
+              <p className="text-base md:text-lg text-muted-foreground">Discover our newest puja services</p>
             </div>
 
             {/* Horizontal Scrollable Cards */}
@@ -302,19 +302,19 @@ export default function Home() {
 
       {/* Featured Services - Creative Grid Layout */}
       {displayFestivalServices.length > 0 && (
-        <section className="px-4 py-16 relative overflow-hidden">
+        <section className="px-4 py-10 md:py-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent" />
           <div className="mx-auto max-w-7xl relative z-10">
             {/* Professional Section Header */}
-            <div className="mb-8">
+            <div className="mb-6 md:mb-8">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-1 w-12 bg-gradient-to-r from-primary to-accent rounded-full" />
                 <span className="text-xs font-bold text-primary uppercase tracking-wider">Featured</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
+              <h2 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
                 Popular Festival Pujas
               </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl">
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
                 Choose from our curated selection of authentic traditional services
               </p>
             </div>

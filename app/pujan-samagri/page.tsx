@@ -83,27 +83,27 @@ export default function PujanSamagriPage() {
             <main className="flex-1 px-4 py-12">
                 <div className="mx-auto max-w-7xl">
                     {/* Header */}
-                    <div className="mb-12">
+                    <div className="mb-8 md:mb-12">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="h-1 w-12 bg-gradient-to-r from-accent to-primary rounded-full" />
                             <span className="text-xs font-bold text-accent uppercase tracking-wider">Sacred Items</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
+                        <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
                             Pujan Samagri
                         </h1>
-                        <p className="text-lg text-muted-foreground max-w-2xl">
+                        <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
                             Authentic and pure samagri for all your sacred rituals and spiritual ceremonies.
                         </p>
                     </div>
 
                     {/* Category Filter */}
-                    <div className="mb-12 overflow-x-auto scrollbar-hide">
-                        <div className="flex gap-3 pb-2">
+                    <div className="mb-8 md:mb-12 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <div className="flex gap-2 sm:gap-3 pb-2">
                             {categoryList.map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setSelectedCategory(cat)}
-                                    className={`px-8 py-3.5 rounded-2xl font-bold whitespace-nowrap transition-all duration-300 ${selectedCategory === cat
+                                    className={`px-4 sm:px-8 py-2 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold whitespace-nowrap transition-all duration-300 text-sm sm:text-base ${selectedCategory === cat
                                         ? 'bg-gradient-to-r from-accent to-primary text-white shadow-xl shadow-accent/20 scale-105'
                                         : 'bg-white dark:bg-card text-muted-foreground hover:bg-accent/10 hover:text-accent border-2 border-border hover:border-accent/50'
                                         }`}

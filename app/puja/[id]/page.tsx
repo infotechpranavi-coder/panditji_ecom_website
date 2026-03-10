@@ -132,19 +132,19 @@ export default function PujaDetailPage() {
       {/* Breadcrumb */}
       <div className="border-b border-border bg-white dark:bg-card">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
               <Link href="/" className="text-muted-foreground hover:text-foreground">Home</Link>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
               <Link href="/gallery" className="text-muted-foreground hover:text-foreground">Gallery</Link>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              <Link href={`/gallery?category=${puja.categorySlug || 'pujas-vrat'}`} className="text-muted-foreground hover:text-foreground">{puja.category}</Link>
+              <Link href={`/gallery?category=${puja.categorySlug || 'pujas-vrat'}`} className="text-muted-foreground hover:text-foreground truncate max-w-[100px] sm:max-w-none">{puja.category}</Link>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              <span className="text-foreground font-medium">{puja.name}</span>
+              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-none">{puja.name}</span>
             </div>
 
             {/* Social Sharing Icons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 sm:gap-3">
               <a
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                 target="_blank"
@@ -375,16 +375,16 @@ export default function PujaDetailPage() {
                     <div className="space-y-6">
                       {puja.reviews.map((review: any, idx: number) => (
                         <div key={idx} className="bg-white dark:bg-card/50 p-6 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow relative">
-                          <div className="flex flex-col items-end absolute top-6 right-6 text-right">
+                          <div className="flex flex-col items-start sm:items-end sm:absolute sm:top-6 sm:right-6 mb-4 sm:mb-0">
                             <span className="font-bold text-gray-900 dark:text-white">{review.user}</span>
                             <span className="text-xs text-muted-foreground">{review.date || 'Nov 08, 2024'}</span>
                           </div>
 
-                          <div className="pr-32">
+                          <div className="sm:pr-32">
                             <p className="text-gray-600 dark:text-gray-300 mb-6 italic">"{review.comment}"</p>
                           </div>
 
-                          <div className="flex flex-col items-end">
+                          <div className="flex flex-col items-start sm:items-end mt-4 border-t border-border/10 pt-4 sm:pt-0 sm:border-0">
                             <span className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-tighter">Rating</span>
                             <div className="flex items-center gap-2">
                               <div className="flex">

@@ -9,7 +9,6 @@ export function Footer() {
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Mumbai' },
         { lang: 'Marathi', text: 'Marathi Guruji in Mumbai' },
-        { lang: 'Odiya', text: 'Odiya Pandits in Mumbai' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins in Mumbai' },
       ]
     },
@@ -18,7 +17,6 @@ export function Footer() {
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Pune' },
         { lang: 'Marathi', text: 'Marathi Guruji in Pune' },
-        { lang: 'Odiya', text: 'Odiya Pandits in Pune' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins in Pune' },
       ]
     },
@@ -26,7 +24,7 @@ export function Footer() {
       name: 'Delhi',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Delhi' },
-        { lang: 'Odiya', text: 'Odiya Pandits in Delhi' },
+        { lang: 'Marathi', text: 'Marathi Guruji in Delhi' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins in Delhi' },
       ]
     },
@@ -34,7 +32,7 @@ export function Footer() {
       name: 'Hyderabad',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Hyderabad' },
-        { lang: 'Odiya', text: 'Odiya Pandits in Hyderabad' },
+        { lang: 'Marathi', text: 'Marathi Guruji in Hyderabad' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins in Hyderabad' },
       ]
     },
@@ -42,7 +40,7 @@ export function Footer() {
       name: 'Prayag',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Prayag' },
-        { lang: 'Odiya', text: 'Odiya Pandits in Prayag' },
+        { lang: 'Marathi', text: 'Marathi Guruji in Prayag' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins in Prayag' },
       ]
     },
@@ -50,7 +48,7 @@ export function Footer() {
       name: 'Benaras Kashi',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits in Kashi' },
-        { lang: 'Odiya', text: 'Odiya Pandits in Kashi' },
+        { lang: 'Marathi', text: 'Marathi Guruji in Kashi' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins in Kashi' },
       ]
     },
@@ -58,7 +56,7 @@ export function Footer() {
       name: '12 Jyotirlingas',
       pandits: [
         { lang: 'Hindi', text: 'Hindi Pandits for Jyotirlinga' },
-        { lang: 'Odiya', text: 'Odiya Pandits for Jyotirlinga' },
+        { lang: 'Marathi', text: 'Marathi Guruji for Jyotirlinga' },
         { lang: 'Gujrati', text: 'Gujrati Brahmins for Jyotirlinga' },
       ]
     },

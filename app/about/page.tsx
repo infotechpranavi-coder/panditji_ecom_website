@@ -44,17 +44,17 @@ export default function AboutPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="px-4 py-20 gradient-hero relative overflow-hidden">
+      <section className="px-4 py-12 md:py-20 gradient-hero relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/15 to-primary/10" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,200,0,0.15),transparent_50%)]" />
         <div className="mx-auto max-w-7xl relative z-10">
-          <div className="inline-block mb-6 px-4 py-1 bg-primary/20 rounded-full">
+          <div className="inline-block mb-4 md:mb-6 px-4 py-1 bg-primary/20 rounded-full">
             <span className="text-xs font-semibold text-primary uppercase tracking-wide">About Us</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-8 text-balance leading-tight">
+          <h1 className="text-3xl md:text-7xl font-extrabold mb-6 md:mb-8 text-balance leading-tight">
             Bridging <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">Sacred Traditions</span> with Modern Access
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl leading-relaxed">
             Book My Panditji is dedicated to preserving and sharing authentic Indian temple traditions with devotees worldwide through innovative e-puja services, bringing spiritual ceremonies into the digital era.
           </p>
         </div>
