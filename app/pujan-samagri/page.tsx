@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { ChevronRight, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 interface Samagri {
     _id: string
@@ -12,6 +13,7 @@ interface Samagri {
     price: number
     discount: number
     category: string
+    categorySlug?: string
     image: string
     description: string
     stockStatus: string
@@ -24,7 +26,10 @@ interface Category {
     isProduct: boolean
 }
 
-export default function PujanSamagriPage() {
+function SamagriContent() {
+    const searchParams = useSearchParams()
+    const urlCategory = searchParams.get('category')
+    
     const [items, setItems] = useState<Samagri[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
@@ -33,6 +38,15 @@ export default function PujanSamagriPage() {
     useEffect(() => {
         fetchData()
     }, [])
+
+    useEffect(() => {
+        if (urlCategory && categories.length > 0) {
+            const found = categories.find(c => c.slug === urlCategory || c.name === urlCategory)
+            if (found) {
+                setSelectedCategory(found.name)
+            }
+        }
+    }, [urlCategory, categories])
 
     const fetchData = async () => {
         try {
@@ -49,8 +63,8 @@ export default function PujanSamagriPage() {
 
             if (categoriesRes.ok) {
                 const catData = await categoriesRes.json()
-                // Filter to show only product categories
-                setCategories(catData.filter((cat: any) => cat.isProduct === true))
+                const productCats = catData.filter((cat: any) => cat.isProduct === true)
+                setCategories(productCats)
             }
         } catch (error) {
             console.error('Error fetching data:', error)
@@ -63,7 +77,7 @@ export default function PujanSamagriPage() {
 
     const filteredItems = selectedCategory === 'All'
         ? items
-        : items.filter(item => item.category === selectedCategory)
+        : items.filter(item => item.category === selectedCategory || item.categorySlug === selectedCategory)
 
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-accent/5 to-background">
@@ -199,5 +213,13 @@ export default function PujanSamagriPage() {
 
             <Footer />
         </div>
+    )
+}
+
+export default function PujanSamagriPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-12 h-12 text-accent animate-spin" /></div>}>
+            <SamagriContent />
+        </Suspense>
     )
 }

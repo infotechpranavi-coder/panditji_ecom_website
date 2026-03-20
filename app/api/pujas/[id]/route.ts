@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Puja from '@/models/Puja'
+import Samagri from '@/models/Samagri'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,14 +27,18 @@ export async function GET(
       puja = await Puja.findOne({ id: id }).catch(() => null)
     }
 
-    if (puja) {
-      console.log(`Successfully found puja: ${puja.name} (ID: ${puja._id})`)
-    } else {
-      console.warn(`Puja NOT found for ID: ${id}`)
+    if (!puja) {
+      console.log(`Puja not found by custom id, trying Samagri collection for: ${id}`)
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        puja = await Samagri.findById(id).catch(() => null)
+      }
+      if (!puja) {
+        puja = await Samagri.findOne({ _id: id }).catch(() => null)
+      }
     }
 
     if (!puja) {
-      return NextResponse.json({ error: 'Puja not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 })
     }
 
     return NextResponse.json(puja)
@@ -62,11 +67,14 @@ export async function PUT(
 
     // If not found by ObjectID, try the custom 'id' field
     if (!puja) {
-      puja = await Puja.findOneAndUpdate({ id: id }, body, { new: true, runValidators: true })
+      // Try updating in Samagri
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        puja = await Samagri.findByIdAndUpdate(id, body, { new: true, runValidators: true }).catch(() => null)
+      }
     }
 
     if (!puja) {
-      return NextResponse.json({ error: 'Puja not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 })
     }
 
     console.log(`Successfully updated puja: ${puja.name}`)
@@ -87,11 +95,11 @@ export async function DELETE(
 
     let result = await Puja.findByIdAndDelete(id).catch(() => null)
     if (!result) {
-      result = await Puja.findOneAndDelete({ id: id })
+      result = await Samagri.findByIdAndDelete(id).catch(() => null)
     }
 
     if (!result) {
-      return NextResponse.json({ error: 'Puja not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 })
     }
 
     return NextResponse.json({ message: 'Puja deleted successfully' })

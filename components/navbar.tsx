@@ -12,8 +12,10 @@ interface Category {
   _id?: string
   name: string
   slug: string
-  description?: string // Added description as optional based on the edit
-  showOnNavbar?: boolean // Added showOnNavbar as optional based on the filter logic
+  description?: string
+  showOnNavbar?: boolean
+  isService?: boolean
+  isProduct?: boolean
 }
 
 export function Navbar() {
@@ -56,10 +58,12 @@ export function Navbar() {
         const navCategories = categories
           .filter((cat: Category) => cat.showOnNavbar === true) // Use Category type
           .map((cat: Category) => ({ // Use Category type
-            id: cat.id || cat._id || '', // Ensure id is always present
-            name: cat.name || '', // Ensure name is always present
-            slug: cat.slug || '', // Ensure slug is always present
-            description: cat.description || '', // Added description
+            id: cat.id || cat._id || '', 
+            name: cat.name || '', 
+            slug: cat.slug || '', 
+            description: cat.description || '',
+            isService: cat.isService,
+            isProduct: cat.isProduct
           }))
         setNavbarCategories(navCategories)
       }
@@ -288,7 +292,7 @@ export function Navbar() {
             {navbarCategories.map((category) => (
               <Link
                 key={category.id}
-                href={`/services?category=${category.slug}`}
+                href={category.isProduct ? `/pujan-samagri?category=${category.slug}` : `/services?category=${category.slug}`}
                 className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary"
               >
                 {category.name}
@@ -317,7 +321,7 @@ export function Navbar() {
               {navbarCategories.map((category) => (
                 <Link
                   key={category.id}
-                  href={`/services?category=${category.slug}`}
+                  href={category.isProduct ? `/pujan-samagri?category=${category.slug}` : `/services?category=${category.slug}`}
                   className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg"
                 >
                   {category.name}

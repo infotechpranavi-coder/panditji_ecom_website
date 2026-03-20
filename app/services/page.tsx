@@ -83,8 +83,14 @@ function ServicesContent() {
                 const pujasData = await pujasRes.json()
                 const categoriesData = await categoriesRes.json()
 
-                setPujas(pujasData.map((p: any) => ({ ...p, id: p.id || p._id })))
-                setCategories(categoriesData.filter((cat: any) => cat.isService !== false))
+                setPujas(pujasData.map((p: any) => ({ 
+                    ...p, 
+                    id: p.id || p._id,
+                    categorySlug: p.categorySlug || p.category.toLowerCase().replace(/\s+/g, '-')
+                })))
+                
+                // Only show categories that are NOT primarily products
+                setCategories(categoriesData.filter((cat: any) => cat.isService === true && cat.isProduct !== true))
             }
         } catch (error) {
             console.error('Error fetching data:', error)
