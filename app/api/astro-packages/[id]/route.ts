@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import AstroPackage from '@/models/AstroPackage'
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect()
-    const id = params.id
+    const { id } = await params
     const body = await request.json()
     const updatedPackage = await AstroPackage.findByIdAndUpdate(id, body, { new: true })
     if (!updatedPackage) return NextResponse.json({ error: 'Package not found' }, { status: 404 })
@@ -16,10 +19,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest, 
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect()
-    const deletedPackage = await AstroPackage.findByIdAndDelete(params.id)
+    const { id } = await params
+    const deletedPackage = await AstroPackage.findByIdAndDelete(id)
     if (!deletedPackage) return NextResponse.json({ error: 'Package not found' }, { status: 404 })
     return NextResponse.json({ message: 'Package deleted successfully' })
   } catch (error: any) {

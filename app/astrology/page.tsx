@@ -146,48 +146,70 @@ export default function AstrologyPage() {
       {packages.length > 0 && (
         <section className="px-4 py-16 pb-0">
           <div className="mx-auto max-w-7xl">
-            <div className="mb-10">
-              <p className="text-xs font-black text-accent uppercase tracking-widest mb-2">Pricing Plans</p>
-              <h2 className="text-2xl md:text-3xl font-extrabold mb-1">Choose Your Consultation</h2>
-              <div className="h-1 w-16 bg-gradient-to-r from-primary to-accent rounded-full" />
-              <p className="mt-3 text-sm text-muted-foreground font-medium">Clear pricing. No hidden costs. Authentic Vedic consultation guaranteed.</p>
+            <div className="mb-12">
+              <p className="text-xs font-black text-accent uppercase tracking-[0.2em] mb-3">Consultation Tiers</p>
+              <h2 className="text-3xl md:text-4xl font-black mb-3 text-gray-900 dark:text-white">Select Your Session</h2>
+              <div className="h-1.5 w-20 bg-gradient-to-r from-primary to-accent rounded-full mb-4" />
+              <p className="text-muted-foreground font-medium max-w-xl leading-relaxed">Choose the guidance that best fits your spiritual journey. Our certified astrologers offer deep insights into your destiny.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {packages.map((pkg) => (
                 <div 
                   key={pkg.id} 
-                  className={`relative group flex flex-col p-8 rounded-[2.5rem] border-2 transition-all duration-500 hover:scale-[1.05] hover:rotate-1 cursor-pointer bg-white dark:bg-card ${selectedPackage?.id === pkg.id ? 'border-primary shadow-2xl scale-[1.05]' : 'border-border/50 hover:border-primary/50 shadow-xl'}`}
+                  className={`relative group flex flex-col p-8 rounded-[2rem] border-2 transition-all duration-500 cursor-pointer overflow-hidden ${
+                    selectedPackage?.id === pkg.id 
+                    ? 'border-primary bg-primary/[0.02] shadow-[0_20px_50px_-12px_rgba(255,160,0,0.3)] scale-[1.02]' 
+                    : 'border-border/40 bg-white dark:bg-card shadow-sm hover:shadow-2xl hover:border-primary/40 hover:-translate-y-2'
+                  }`}
                   onClick={() => handleSelectPackage(pkg)}
                 >
+                  {/* Premium Background Accent */}
+                  <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] -z-10 transition-opacity duration-500 ${selectedPackage?.id === pkg.id ? 'bg-primary/20 opacity-100' : 'bg-accent/10 opacity-0 group-hover:opacity-100'}`} />
+                  
+                  {/* Popular Badge */}
                   {pkg.isPopular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black uppercase tracking-[0.2em] px-6 py-1.5 rounded-full shadow-lg z-20">
-                      Most Popular
+                    <div className="absolute top-0 right-0">
+                      <div className="bg-gradient-to-br from-primary to-accent text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl shadow-lg border-l border-b border-primary/20">
+                        Popular
+                      </div>
                     </div>
                   )}
+
+                  {/* Card Header */}
                   <div className="mb-8">
-                    <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors">{pkg.name}</h3>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black text-primary">₹{pkg.price}</span>
-                      <span className="text-sm text-muted-foreground font-bold">{pkg.unit}</span>
+                    <h3 className={`text-xl font-black mb-2 transition-colors duration-300 ${selectedPackage?.id === pkg.id ? 'text-primary' : 'text-gray-900 dark:text-white group-hover:text-primary'}`}>
+                      {pkg.name}
+                    </h3>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-3xl font-black tracking-tight">₹{pkg.price}</span>
+                      <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider">{pkg.unit}</span>
                     </div>
                   </div>
+
+                  {/* Features List */}
                   <div className="flex-1 space-y-4 mb-8">
                     {pkg.features.map((feature, idx) => (
-                      <div key={idx} className="flex gap-3 items-start">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm font-semibold text-muted-foreground leading-tight group-hover:text-foreground transition-colors">{feature}</span>
+                      <div key={idx} className="flex gap-3 items-start group/feat">
+                        <div className={`mt-0.5 p-0.5 rounded-full transition-colors duration-300 flex-shrink-0 ${selectedPackage?.id === pkg.id ? 'bg-green-500/20 text-green-600' : 'bg-primary/10 text-primary group-hover/feat:bg-green-500/20 group-hover/feat:text-green-600'}`}>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-sm font-semibold text-muted-foreground leading-snug transition-colors duration-300 group-hover:text-foreground">
+                          {feature}
+                        </span>
                       </div>
                     ))}
                   </div>
-                  <div className={`mt-auto pt-6 border-t border-border/50 flex flex-col gap-4 text-center ${selectedPackage?.id === pkg.id ? 'opacity-100' : 'opacity-80'}`}>
+
+                  {/* Action Button */}
+                  <div className={`mt-auto pt-6 border-t border-border/20 transition-all duration-300 ${selectedPackage?.id === pkg.id ? 'opacity-100' : 'opacity-100'}`}>
                     {selectedPackage?.id === pkg.id ? (
-                      <div className="text-primary font-black flex items-center justify-center gap-2">
-                        Selected <span className="text-lg">✓</span>
+                      <div className="w-full py-3 bg-primary text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-primary/30 animate-in fade-in zoom-in-95 duration-300">
+                        Active Selection <span className="text-sm">✓</span>
                       </div>
                     ) : (
-                      <button className="py-3 px-6 bg-primary/10 text-primary rounded-2xl font-black hover:bg-primary hover:text-white transition-all transform active:scale-95 group-hover:shadow-lg">
-                        Choose Plan
+                      <button className="w-full py-3 px-6 bg-muted/60 text-muted-foreground group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent group-hover:text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 transform active:scale-95 shadow-inner hover:shadow-lg hover:shadow-primary/20">
+                        Choose This Plan
                       </button>
                     )}
                   </div>
