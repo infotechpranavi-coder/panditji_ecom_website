@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown, MapPin, Languages } from 'lucide-react'
+import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown, MapPin, Languages, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -264,6 +264,13 @@ export function Navbar() {
                   Pujan Samagri
                 </button>
               </div>
+              <Link 
+                href="/contact?subject=Online Puja" 
+                className="hidden md:flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-full text-xs font-black shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all animate-pulse"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>ONLINE PUJA</span>
+              </Link>
               <button
                 className="md:hidden p-2 hover:bg-primary/10 rounded-lg"
                 onClick={() => setIsOpen(!isOpen)}
@@ -332,6 +339,13 @@ export function Navbar() {
               </Link>
               <Link href="/contact" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
                 Contact
+              </Link>
+              <Link
+                href="/contact?subject=Online Puja"
+                className="block mx-4 py-3 text-sm font-black text-white bg-gradient-to-r from-primary to-accent rounded-xl text-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all mt-2"
+                onClick={() => setIsOpen(false)}
+              >
+                ONLINE PUJA
               </Link>
               <button
                 onClick={() => {

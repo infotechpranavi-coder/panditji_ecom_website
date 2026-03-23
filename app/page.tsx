@@ -250,13 +250,13 @@ export default function Home() {
             {/* Professional Section Header */}
             <div className="mb-8 md:mb-12">
               <div className="flex items-center gap-3 mb-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-red-600 to-red-500 rounded-full" />
-                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">Latest</span>
+                <div className="h-1 w-12 bg-gradient-to-r from-primary to-accent rounded-full" />
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">Sacred</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
-                LATEST PUJA
+                PUJAS FOR EVERY OCCASION
               </h2>
-              <p className="text-base md:text-lg text-muted-foreground">Discover our newest puja services</p>
+              <p className="text-base md:text-lg text-muted-foreground">Find the perfect puja for every milestone and traditional celebration</p>
             </div>
 
             {/* Horizontal Scrollable Cards */}
@@ -299,6 +299,125 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Puja & Vrat Section - Creative Masonry Style */}
+      {pujaVratServices.length > 0 && (
+        <section className="px-4 py-16 bg-gradient-to-b from-background via-accent/5 to-background relative">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,200,0,0.05),transparent_50%)]" />
+          <div className="mx-auto max-w-7xl relative z-10">
+            {/* Professional Section Header */}
+            <div className="mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-1 w-12 bg-gradient-to-r from-accent to-primary rounded-full" />
+                    <span className="text-xs font-bold text-accent uppercase tracking-wider">Traditional</span>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
+                    Puja & Vrat Services
+                  </h2>
+                  <p className="text-lg text-muted-foreground max-w-2xl">
+                    Traditional rituals and vrat services performed with devotion and authenticity
+                  </p>
+                </div>
+                <Link
+                  href="/services"
+                  className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary/10 hover:bg-primary/20 rounded-xl font-semibold text-primary transition-all"
+                >
+                  View All <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Creative Grid - Mix of sizes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {pujaVratServices.map((service, index) => {
+                const isLarge = index === 0
+                return (
+                  <Link
+                    key={service.id}
+                    href={`/puja/${service.id}`}
+                    className={`group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-xl transition-all duration-300 relative ${isLarge ? 'sm:col-span-2 lg:col-span-2' : ''
+                      }`}
+                  >
+                    {service.discount && (
+                      <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
+                        -{service.discount}%
+                      </div>
+                    )}
+                    <div className={`relative ${isLarge ? 'h-56' : 'h-44'} bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden`}>
+                      {service.image && service.image !== '/placeholder.jpg' ? (
+                        <img src={service.image} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      ) : (
+                        <>
+                          <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                        </>
+                      )}
+                    </div>
+                    <div className={`${isLarge ? 'p-6' : 'p-5'} bg-white dark:bg-card`}>
+                      <h3 className={`font-bold ${isLarge ? 'text-xl' : 'text-lg'} mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1`}>
+                        {service.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        {service.shortDescription || 'Authentic traditional rituals performed by experts'}
+                      </p>
+                      <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                        <span className="text-sm font-bold text-accent">View Details</span>
+                        <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
+                          <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Why Choose Us Section - Separate Professional Section */}
+      <section className="px-4 py-16 relative overflow-hidden bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
+        <div className="mx-auto max-w-7xl relative z-10">
+          {/* Professional Section Header */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-1 w-12 bg-white/80 rounded-full" />
+              <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Benefits</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
+              Why Choose Us?
+            </h2>
+            <p className="text-lg text-white/90 max-w-2xl">
+              Experience the difference of authentic traditional services
+            </p>
+          </div>
+
+          {/* Why Choose Us Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Shield, title: 'Certified Priests', desc: 'All priests are verified and certified' },
+              { icon: Clock, title: 'Flexible Timing', desc: 'Book at your convenience' },
+              { icon: Heart, title: 'Authentic Rituals', desc: 'Traditional methods preserved' },
+              { icon: Star, title: 'Satisfaction Guaranteed', desc: '100% authentic experience' },
+            ].map((item, i) => (
+              <div key={i} className="group bg-white/95 dark:bg-white/10 backdrop-blur-sm rounded-2xl p-8 border-2 border-white/20 card-elevated hover:border-white/40 hover:shadow-xl transition-all duration-300">
+                <div className="mb-6 flex items-center justify-start">
+                  <item.icon className="w-10 h-10 text-gray-900 dark:text-white stroke-1" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Featured Services - Creative Grid Layout */}
       {displayFestivalServices.length > 0 && (
@@ -455,125 +574,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Why Choose Us Section - Separate Professional Section */}
-      <section className="px-4 py-16 relative overflow-hidden bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
-        <div className="mx-auto max-w-7xl relative z-10">
-          {/* Professional Section Header */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-1 w-12 bg-white/80 rounded-full" />
-              <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Benefits</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
-              Why Choose Us?
-            </h2>
-            <p className="text-lg text-white/90 max-w-2xl">
-              Experience the difference of authentic traditional services
-            </p>
-          </div>
-
-          {/* Why Choose Us Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: Shield, title: 'Certified Priests', desc: 'All priests are verified and certified' },
-              { icon: Clock, title: 'Flexible Timing', desc: 'Book at your convenience' },
-              { icon: Heart, title: 'Authentic Rituals', desc: 'Traditional methods preserved' },
-              { icon: Star, title: 'Satisfaction Guaranteed', desc: '100% authentic experience' },
-            ].map((item, i) => (
-              <div key={i} className="group bg-white/95 dark:bg-white/10 backdrop-blur-sm rounded-2xl p-8 border-2 border-white/20 card-elevated hover:border-white/40 hover:shadow-xl transition-all duration-300">
-                <div className="mb-6 flex items-center justify-start">
-                  <item.icon className="w-10 h-10 text-gray-900 dark:text-white stroke-1" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Puja & Vrat Section - Creative Masonry Style */}
-      {pujaVratServices.length > 0 && (
-        <section className="px-4 py-16 bg-gradient-to-b from-background via-accent/5 to-background relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,200,0,0.05),transparent_50%)]" />
-          <div className="mx-auto max-w-7xl relative z-10">
-            {/* Professional Section Header */}
-            <div className="mb-12">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-1 w-12 bg-gradient-to-r from-accent to-primary rounded-full" />
-                    <span className="text-xs font-bold text-accent uppercase tracking-wider">Traditional</span>
-                  </div>
-                  <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
-                    Puja & Vrat Services
-                  </h2>
-                  <p className="text-lg text-muted-foreground max-w-2xl">
-                    Traditional rituals and vrat services performed with devotion and authenticity
-                  </p>
-                </div>
-                <Link
-                  href="/services"
-                  className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary/10 hover:bg-primary/20 rounded-xl font-semibold text-primary transition-all"
-                >
-                  View All <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Creative Grid - Mix of sizes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {pujaVratServices.map((service, index) => {
-                const isLarge = index === 0
-                return (
-                  <Link
-                    key={service.id}
-                    href={`/puja/${service.id}`}
-                    className={`group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-xl transition-all duration-300 relative ${isLarge ? 'sm:col-span-2 lg:col-span-2' : ''
-                      }`}
-                  >
-                    {service.discount && (
-                      <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
-                        -{service.discount}%
-                      </div>
-                    )}
-                    <div className={`relative ${isLarge ? 'h-56' : 'h-44'} bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden`}>
-                      {service.image && service.image !== '/placeholder.jpg' ? (
-                        <img src={service.image} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                      ) : (
-                        <>
-                          <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                        </>
-                      )}
-                    </div>
-                    <div className={`${isLarge ? 'p-6' : 'p-5'} bg-white dark:bg-card`}>
-                      <h3 className={`font-bold ${isLarge ? 'text-xl' : 'text-lg'} mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1`}>
-                        {service.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {service.shortDescription || 'Authentic traditional rituals performed by experts'}
-                      </p>
-                      <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                        <span className="text-sm font-bold text-accent">View Details</span>
-                        <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
-                          <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                )
-              })}
             </div>
           </div>
         </section>

@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { WhatsAppButton } from '@/components/whatsapp-button'
@@ -18,7 +19,10 @@ import {
     Smartphone
 } from 'lucide-react'
 
-export default function ContactPage() {
+function ContactForm() {
+    const searchParams = useSearchParams()
+    const urlSubject = searchParams.get('subject')
+    
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [formData, setFormData] = useState({
@@ -27,6 +31,12 @@ export default function ContactPage() {
         subject: '',
         message: ''
     })
+
+    useEffect(() => {
+        if (urlSubject) {
+            setFormData(prev => ({ ...prev, subject: urlSubject }))
+        }
+    }, [urlSubject])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -79,9 +89,7 @@ export default function ContactPage() {
     ]
 
     return (
-        <div className="min-h-screen flex flex-col bg-background">
-            <Navbar />
-
+        <>
             {/* Breadcrumb */}
             <div className="border-b border-border/50 px-4">
                 <div className="mx-auto max-w-7xl w-full py-4 text-sm flex items-center gap-2">
@@ -123,7 +131,7 @@ export default function ContactPage() {
                                 {item.icon}
                             </div>
                             <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:rotate-6 transition-all">
-                                {React.cloneElement(item.icon, { className: 'w-10 h-10 text-primary group-hover:text-white transition-colors' })}
+                                {React.cloneElement(item.icon as any, { className: 'w-10 h-10 text-primary group-hover:text-white transition-colors' })}
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-4">{item.title}</h3>
                             <div className="space-y-2">
@@ -289,7 +297,24 @@ export default function ContactPage() {
                     </div>
                 </div>
             </section>
+        </>
+    )
+}
 
+export default function ContactPage() {
+    return (
+        <div className="min-h-screen flex flex-col bg-background">
+            <Navbar />
+            <Suspense fallback={
+                <div className="flex-1 flex flex-col">
+                    <div className="h-20 w-full animate-pulse bg-muted/20 border-b border-border/50" />
+                    <div className="flex-1 flex items-center justify-center bg-background text-primary">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+                    </div>
+                </div>
+            }>
+                <ContactForm />
+            </Suspense>
             <Footer />
             <WhatsAppButton />
         </div>
