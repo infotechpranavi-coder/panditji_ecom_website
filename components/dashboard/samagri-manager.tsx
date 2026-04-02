@@ -127,7 +127,7 @@ export function SamagriManager({ onEdit }: SamagriManagerProps) {
                         <p className="text-sm text-muted-foreground mb-4">{item.category} • {item.sku || 'No SKU'}</p>
 
                         <div className="flex items-center justify-between pt-4 border-t border-border">
-                            <span className="text-lg font-black text-primary">₹{item.price}</span>
+                            <span className="text-sm font-bold text-muted-foreground uppercase">Inventory Item</span>
                             <span className={`text-xs font-bold px-2 py-1 rounded-full ${item.stockStatus === 'in_stock'
                                     ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
                                     : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'

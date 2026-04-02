@@ -7,10 +7,11 @@ import { CategoryManager } from '@/components/dashboard/category-manager'
 import { BannerManager } from '@/components/dashboard/banner-manager'
 import { GalleryManager } from '@/components/dashboard/gallery-manager'
 import { TeamManager } from '@/components/dashboard/team-manager'
+import { FestivalManager } from '@/components/dashboard/festival-manager'
 import { AddSamagriForm } from '@/components/dashboard/add-samagri-form'
 import { SamagriManager } from '@/components/dashboard/samagri-manager'
 import { AstroPackageManager } from '@/components/dashboard/astro-package-manager'
-import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder, Image, ImageIcon, UsersRound, ShoppingBag, Star } from 'lucide-react'
+import { Package, Users, TrendingUp, Lock, User, Eye, EyeOff, Folder, Image, ImageIcon, UsersRound, ShoppingBag, Star, Calendar } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function DashboardPage() {
@@ -20,7 +21,7 @@ export default function DashboardPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'add-samagri' | 'manage-samagri' | 'bookings' | 'categories' | 'banners' | 'gallery' | 'team' | 'astro-packages'>('add')
+  const [activeTab, setActiveTab] = useState<'add' | 'manage' | 'add-samagri' | 'manage-samagri' | 'bookings' | 'categories' | 'banners' | 'gallery' | 'team' | 'astro-packages' | 'festivals'>('add')
   const [editingPuja, setEditingPuja] = useState<any>(null)
   const [editingSamagri, setEditingSamagri] = useState<any>(null)
 
@@ -328,6 +329,16 @@ export default function DashboardPage() {
             <Star className="w-4 h-4" />
             Astrology Packages
           </button>
+          <button
+            onClick={() => setActiveTab('festivals')}
+            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'festivals'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-primary'
+              }`}
+          >
+            <Calendar className="w-4 h-4" />
+            Sacred Calendar
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -354,6 +365,7 @@ export default function DashboardPage() {
           {activeTab === 'bookings' && <CustomerBookings />}
           {activeTab === 'team' && <TeamManager />}
           {activeTab === 'astro-packages' && <AstroPackageManager />}
+          {activeTab === 'festivals' && <FestivalManager />}
           {activeTab === 'add-samagri' && (
             <AddSamagriForm
               editingSamagri={editingSamagri}

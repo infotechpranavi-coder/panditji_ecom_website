@@ -60,6 +60,21 @@ export function Footer() {
         { lang: 'Gujrati', text: 'Gujrati Brahmins for Jyotirlinga' },
       ]
     },
+    {
+      name: 'Chitrakoot Dham',
+      pandits: [
+        { lang: 'Hindi', text: 'Hindi Pandits in Chitrakoot' },
+        { lang: 'Vedic', text: 'Vedic Brahmins in Chitrakoot' },
+      ]
+    },
+    {
+      name: 'Nashik Trimbakeshwar',
+      pandits: [
+        { lang: 'Hindi', text: 'Hindi Pandits in Nashik' },
+        { lang: 'Marathi', text: 'Marathi Guruji in Nashik' },
+        { lang: 'Vedic', text: 'Vedic Brahmins in Nashik' },
+      ]
+    },
   ]
 
   return (

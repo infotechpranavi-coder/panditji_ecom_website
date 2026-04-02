@@ -139,17 +139,12 @@ function SamagriContent() {
                             {filteredItems.map((item, index) => {
                                 const isLarge = index % 5 === 0
                                 return (
-                                    <div
+                                    <Link
                                         key={item._id}
-                                        className={`group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-500 relative ${isLarge ? 'lg:col-span-2 lg:row-span-1' : ''
+                                        href={`/pujan-samagri/${item._id}`}
+                                        className={`group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-500 relative block ${isLarge ? 'lg:col-span-2 lg:row-span-1' : ''
                                             }`}
                                     >
-                                        {item.discount > 0 && (
-                                            <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
-                                                -{item.discount}%
-                                            </div>
-                                        )}
-
                                         <div className={`relative ${isLarge ? 'h-64' : 'h-48'} bg-gradient-to-br from-accent/5 to-primary/5 flex items-center justify-center overflow-hidden`}>
                                             {item.image ? (
                                                 <img
@@ -178,23 +173,14 @@ function SamagriContent() {
                                             <p className="text-sm text-muted-foreground mb-6 line-clamp-2">
                                                 {item.description || 'Authentic traditional samagri for your sacred rituals.'}
                                             </p>
-
                                             <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                                                <div className="flex flex-col">
-                                                    {item.discount > 0 && (
-                                                        <span className="text-xs text-muted-foreground line-through opacity-60">₹{Math.round(item.price * (1 + item.discount / 100))}</span>
-                                                    )}
-                                                    <span className="text-xl font-black text-accent">₹{item.price}</span>
-                                                </div>
-                                                <button
-                                                    className="p-3 bg-accent/10 rounded-xl group-hover:bg-accent group-hover:text-white transition-all shadow-lg shadow-accent/5"
-                                                    disabled={item.stockStatus === 'out_of_stock'}
-                                                >
+                                                <span className="text-sm font-bold text-accent">View Details</span>
+                                                <div className="p-3 bg-accent/10 rounded-xl group-hover:bg-accent group-hover:text-white transition-all shadow-lg shadow-accent/5">
                                                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                                                </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 )
                             })}
                         </div>

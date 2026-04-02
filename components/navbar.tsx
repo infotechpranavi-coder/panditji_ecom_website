@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown, MapPin, Languages, Sparkles } from 'lucide-react'
+import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown, MapPin, Languages, Sparkles, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -20,6 +20,7 @@ interface Category {
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [navbarCategories, setNavbarCategories] = useState<Category[]>([]) // Changed type to Category[]
@@ -30,9 +31,21 @@ export function Navbar() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const router = useRouter()
 
+  const performSearch = () => {
+    const searchParams = new URLSearchParams()
+    if (searchQuery.trim()) searchParams.set('search', searchQuery.trim())
+    if (selectedCity && selectedCity !== 'Choose City') searchParams.set('city', selectedCity)
+    if (selectedLanguage && selectedLanguage !== 'Choose Lang') searchParams.set('lang', selectedLanguage)
+    
+    if (searchParams.toString()) {
+      router.push(`/services?${searchParams.toString()}`)
+      setIsMobileSearchOpen(false)
+    }
+  }
+
   const handlePujaSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      router.push(`/services?search=${encodeURIComponent(searchQuery.trim())}`)
+    if (e.key === 'Enter') {
+      performSearch()
     }
   }
 
@@ -226,8 +239,14 @@ export function Navbar() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handlePujaSearch}
-                        className="w-full pl-10 pr-4 py-2 border-2 border-border rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-card text-sm font-medium placeholder:text-muted-foreground/60 transition-colors h-10"
+                        className="w-full pl-10 pr-12 py-2 border-2 border-border rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-card text-sm font-medium placeholder:text-muted-foreground/60 transition-colors h-10"
                       />
+                      <button 
+                        onClick={performSearch}
+                        className="absolute right-1 top-1 bottom-1 px-2.5 bg-gradient-to-r from-primary to-accent text-white rounded-md hover:scale-105 active:scale-95 transition-all shadow-sm"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -272,8 +291,22 @@ export function Navbar() {
                 <span>ONLINE PUJA</span>
               </Link>
               <button
+                className="md:hidden p-2 hover:bg-primary/10 rounded-lg text-primary"
+                onClick={() => {
+                  setIsMobileSearchOpen(!isMobileSearchOpen);
+                  if (isOpen) setIsOpen(false);
+                }}
+                aria-label="Toggle search"
+              >
+                {isMobileSearchOpen ? <X className="w-6 h-6" /> : <Search className="w-6 h-6" />}
+              </button>
+
+              <button
                 className="md:hidden p-2 hover:bg-primary/10 rounded-lg"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                  setIsOpen(!isOpen);
+                  if (isMobileSearchOpen) setIsMobileSearchOpen(false);
+                }}
                 aria-label="Toggle menu"
               >
                 {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -282,6 +315,146 @@ export function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Search Bar */}
+      <AnimatePresence>
+        {isMobileSearchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden bg-background border-b border-border/50 overflow-hidden"
+          >
+            <div className="px-4 py-4 space-y-4">
+              {/* Mode Toggle */}
+              <div className="flex bg-muted/60 p-1 rounded-xl border border-border/50">
+                <button
+                  onClick={() => setSearchType('puja')}
+                  className={`flex-1 py-2 rounded-lg text-xs uppercase tracking-wider font-extrabold transition-all ${searchType === 'puja' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground'}`}
+                >
+                  Pooja Services
+                </button>
+                <button
+                  onClick={() => setSearchType('samagri')}
+                  className={`flex-1 py-2 rounded-lg text-xs uppercase tracking-wider font-extrabold transition-all ${searchType === 'samagri' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground'}`}
+                >
+                  Pujan Samagri
+                </button>
+              </div>
+
+              {/* Input */}
+              <div className="relative flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder={searchType === 'puja' ? "Search for Puja Services..." : "Find Rudraksha, Gems, Samagri..."}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={searchType === 'puja' ? handlePujaSearch : undefined}
+                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border-2 border-transparent focus:border-primary/50 focus:bg-background rounded-xl outline-none transition-all font-bold text-sm shadow-inner"
+                  />
+                </div>
+                <button 
+                  onClick={performSearch}
+                  className="p-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Quick Filters for Puja */}
+              {searchType === 'puja' && (
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => setIsCityOpen(!isCityOpen)}
+                    className="flex items-center justify-between px-3 py-2 bg-white dark:bg-card border border-border rounded-lg text-[10px] font-black"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <MapPin className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="truncate">{selectedCity || 'CITY'}</span>
+                    </div>
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                  <button 
+                    onClick={() => setIsLangOpen(!isLangOpen)}
+                    className="flex items-center justify-between px-3 py-2 bg-white dark:bg-card border border-border rounded-lg text-[10px] font-black"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <Languages className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="truncate">{selectedLanguage || 'LANG'}</span>
+                    </div>
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            {/* Popups for City/Lang on Mobile */}
+            <AnimatePresence>
+              {isCityOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="px-4 pb-6"
+                >
+                  <div className="bg-white dark:bg-card rounded-xl border border-border p-4 shadow-xl">
+                    <h4 className="text-primary font-black text-xs mb-3 flex items-center gap-2">
+                       <MapPin className="w-3 h-3" /> SELECT CITY
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {cities.map((city) => (
+                        <button
+                          key={city}
+                          onClick={() => { setSelectedCity(city); setIsCityOpen(false); }}
+                          className={`px-3 py-1 rounded-lg border text-[10px] font-black transition-all ${selectedCity === city ? 'bg-primary text-white border-primary' : 'border-primary text-primary hover:bg-primary/5'}`}
+                        >
+                          {city}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => { setSelectedCity('Online E-Puja'); setIsCityOpen(false); }}
+                        className={`px-3 py-1 rounded-lg border text-[10px] font-black transition-all ${selectedCity === 'Online E-Puja' ? 'bg-primary text-white border-primary' : 'border-primary text-primary hover:bg-primary/5'}`}
+                      >
+                        Online E-Puja
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {isLangOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="px-4 pb-6"
+                >
+                  <div className="bg-white dark:bg-card rounded-xl border border-border p-4 shadow-xl">
+                    <h4 className="text-primary font-black text-xs mb-3 flex items-center gap-2">
+                       <Languages className="w-3 h-3" /> SELECT LANGUAGE
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {languages.map((lang) => (
+                        <button
+                          key={lang}
+                          onClick={() => { setSelectedLanguage(lang); setIsLangOpen(false); }}
+                          className={`px-3 py-1 rounded-lg border text-[10px] font-black transition-all ${selectedLanguage === lang ? 'bg-primary text-white border-primary' : 'border-primary text-primary hover:bg-primary/5'}`}
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Navigation Menu */}
       <div className="bg-gradient-to-r from-primary/5 to-accent/5 border-b border-border/50">

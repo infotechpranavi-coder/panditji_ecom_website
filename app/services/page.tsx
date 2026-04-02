@@ -24,8 +24,10 @@ interface Puja {
     image: string
     shortDescription?: string
     description: string
+    fullDescription?: string
     price?: number
     discount?: number
+    features?: string[]
 }
 
 function ServicesContent() {
@@ -100,15 +102,34 @@ function ServicesContent() {
     }
 
     const filteredPujas = useMemo(() => {
+        const urlCity = searchParams.get('city')?.toLowerCase() || ''
+        const urlLang = searchParams.get('lang')?.toLowerCase() || ''
+
         return pujas.filter(puja => {
             const matchesCategory = selectedCategory === 'all' ||
                 puja.categorySlug === selectedCategory ||
                 puja.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory
-            const matchesSearch = puja.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                puja.description?.toLowerCase().includes(searchQuery.toLowerCase())
-            return matchesCategory && matchesSearch
+            
+            const searchText = searchQuery.toLowerCase()
+            
+            // Create a comprehensive blob of all searchable text for this puja
+            const searchBlob = [
+                puja.name,
+                puja.category,
+                puja.shortDescription || '',
+                puja.description || '',
+                puja.fullDescription || '',
+                (puja.features || []).join(' ')
+            ].join(' ').toLowerCase()
+
+            // Check if ANY of the filters match the search blob
+            const matchesSearch = !searchText || searchBlob.includes(searchText)
+            const matchesCity = !urlCity || searchBlob.includes(urlCity)
+            const matchesLang = !urlLang || searchBlob.includes(urlLang)
+            
+            return matchesCategory && matchesSearch && matchesCity && matchesLang
         })
-    }, [pujas, selectedCategory, searchQuery])
+    }, [pujas, selectedCategory, searchQuery, searchParams])
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">

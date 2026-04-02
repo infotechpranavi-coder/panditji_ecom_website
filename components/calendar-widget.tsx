@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Calendar, Sparkles, ChevronDown } from 'lucide-react'
 
 interface CalendarWidgetProps {
@@ -9,58 +9,63 @@ interface CalendarWidgetProps {
 
 // Festival data organized by month (0-indexed: 0 = January, 1 = February, etc.)
 const festivalsByMonth: Record<number, Array<{ date: string; festival: string }>> = {
-    0: [ // January
+    0: [ // January 2026
         { date: '1', festival: 'New Year' },
-        { date: '14', festival: 'Makar Sankranti' },
+        { date: '14', festival: 'Makar Sankranti / Pongal' },
         { date: '26', festival: 'Republic Day' },
     ],
-    1: [ // February
-        { date: '1', festival: 'Vasant Panchami' },
-        { date: '13', festival: 'Ratha Saptami' },
+    1: [ // February 2026
+        { date: '1', festival: 'Maha Shivratri' },
+        { date: '13', festival: 'Kumbh Mela Begins' },
         { date: '15', festival: 'Maha Shivratri' },
-        { date: '26', festival: 'Holi (Holika Dahan)' },
     ],
-    2: [ // March
-        { date: '8', festival: 'Holi' },
-        { date: '14', festival: 'Ugadi' },
-        { date: '22', festival: 'Gudi Padwa' },
-        { date: '30', festival: 'Ram Navami' },
+    2: [ // March 2026
+        { date: '4', festival: 'Holi (Dhulandi)' },
+        { date: '19', festival: 'Gudi Padwa / Ugadi' },
+        { date: '27', festival: 'Ram Navami' },
     ],
-    3: [ // April
-        { date: '6', festival: 'Mahavir Jayanti' },
-        { date: '14', festival: 'Baisakhi' },
-        { date: '21', festival: 'Hanuman Jayanti' },
+    3: [ // April 2026
+        { date: '2', festival: 'Hanuman Jayanti' },
+        { date: '14', festival: 'Baisakhi / Puthandu / Ambedkar Jayanti' },
+        { date: '19', festival: 'Akshaya Tritiya' },
+        { date: '30', festival: 'Narasimha Jayanti' },
     ],
-    4: [ // May
-        { date: '23', festival: 'Buddha Purnima' },
+    4: [ // May 2026
+        { date: '1', festival: 'Buddha Purnima' },
+        { date: '16', festival: 'Shani Jayanti' },
+        { date: '31', festival: 'Vat Savitri Vrat' },
     ],
-    5: [ // June
+    5: [ // June 2026
         { date: '21', festival: 'International Yoga Day' },
+        { date: '25', festival: 'Devshayani Ekadashi' },
     ],
-    6: [ // July
-        { date: '7', festival: 'Rath Yatra' },
+    6: [ // July 2026
+        { date: '16', festival: 'Rath Yatra' },
+        { date: '29', festival: 'Guru Purnima' },
     ],
-    7: [ // August
+    7: [ // August 2026
         { date: '15', festival: 'Independence Day' },
-        { date: '16', festival: 'Janmashtami' },
-        { date: '26', festival: 'Ganesh Chaturthi' },
+        { date: '25', festival: 'Varalakshmi Vratam' },
+        { date: '28', festival: 'Raksha Bandhan' },
     ],
-    8: [ // September
-        { date: '7', festival: 'Ganesh Visarjan' },
-        { date: '15', festival: 'Onam' },
+    8: [ // September 2026
+        { date: '4', festival: 'Janmashtami' },
+        { date: '14', festival: 'Ganesh Chaturthi' },
+        { date: '24', festival: 'Anant Chaturdashi' },
     ],
-    9: [ // October
+    9: [ // October 2026
         { date: '2', festival: 'Gandhi Jayanti' },
-        { date: '12', festival: 'Dussehra' },
-        { date: '20', festival: 'Karwa Chauth' },
-        { date: '24', festival: 'Diwali' },
-        { date: '31', festival: 'Bhai Dooj' },
+        { date: '11', festival: 'Navratri Begins' },
+        { date: '20', festival: 'Dussehra / Vijaya Dashami' },
+        { date: '30', festival: 'Karwa Chauth' },
     ],
-    10: [ // November
-        { date: '1', festival: 'Govardhan Puja' },
-        { date: '15', festival: 'Guru Nanak Jayanti' },
+    10: [ // November 2026
+        { date: '8', festival: 'Diwali (Deepavali)' },
+        { date: '10', festival: 'Bhai Dooj' },
+        { date: '15', festival: 'Chhath Puja' },
     ],
-    11: [ // December
+    11: [ // December 2026
+        { date: '14', festival: 'Vivah Panchami' },
         { date: '25', festival: 'Christmas' },
     ],
 }
@@ -83,8 +88,36 @@ export function CalendarWidget({ onDateSelect }: CalendarWidgetProps) {
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-    // Get festivals for current month
-    const currentMonthFestivals = festivalsByMonth[month] || []
+    const [dynamicFestivals, setDynamicFestivals] = useState<Array<{ date: string; festival: string }>>([])
+    
+    useEffect(() => {
+        fetchFestivals()
+    }, [month, year])
+
+    const fetchFestivals = async () => {
+        try {
+            const response = await fetch(`/api/festivals?month=${month}&year=${year}`)
+            if (response.ok) {
+                const data = await response.json()
+                if (data && data.length > 0) {
+                    setDynamicFestivals(data.map((f: any) => ({
+                        date: new Date(f.date).getDate().toString(),
+                        festival: f.name
+                    })))
+                } else {
+                    setDynamicFestivals([])
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching festivals:', error)
+        }
+    }
+
+    // Get festivals for current month (Prefer dynamic, fallback to static)
+    const currentMonthFestivals = dynamicFestivals.length > 0 
+        ? dynamicFestivals 
+        : (festivalsByMonth[month] || [])
+    
     const hasMoreThanThree = currentMonthFestivals.length > 3
 
     const handleDateClick = (day: number, isPrevMonth: boolean = false, isNextMonth: boolean = false) => {

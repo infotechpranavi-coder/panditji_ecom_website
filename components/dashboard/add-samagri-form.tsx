@@ -129,7 +129,7 @@ export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormP
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!formData.name || !formData.price || !formData.category) {
+        if (!formData.name || !formData.category) {
             alert('Please fill in required fields.')
             return
         }
@@ -189,22 +189,12 @@ export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormP
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-semibold mb-2">Price (INR) *</label>
-                        <input type="number" name="price" value={formData.price} onChange={handleInputChange} required className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-semibold mb-2">Discount (%)</label>
-                        <input type="number" name="discount" value={formData.discount} onChange={handleInputChange} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-semibold mb-2">Category *</label>
-                        <select name="category" value={formData.category} onChange={handleInputChange} required className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900">
-                            <option value="">Select Category</option>
-                            {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                        </select>
-                    </div>
+                <div>
+                    <label className="block text-sm font-semibold mb-2">Category *</label>
+                    <select name="category" value={formData.category} onChange={handleInputChange} required className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900">
+                        <option value="">Select Category</option>
+                        {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    </select>
                 </div>
 
                 <div>
