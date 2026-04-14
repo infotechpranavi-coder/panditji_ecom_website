@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingCart, Menu, X, Phone, Search, User, ChevronDown, MapPin, Languages, Sparkles, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
@@ -114,14 +115,19 @@ export function Navbar() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 gap-6">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">
-                🕉️
+            <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
+              <div className="relative w-20 h-20 group-hover:scale-110 transition-transform">
+                <Image 
+                  src="/pandit_only logo.png" 
+                  alt="Book Panditji Seva Logo" 
+                  fill 
+                  className="object-contain" 
+                />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col pt-3">
                 <div className="flex items-center gap-1">
-                  <span className="text-xl font-black text-primary">Book Panditji</span>
-                  <span className="text-xl font-black text-accent">Seva</span>
+                  <span className="text-xl md:text-2xl font-black text-primary">Book Panditji</span>
+                  <span className="text-xl md:text-2xl font-black text-accent">Seva</span>
                 </div>
               </div>
             </Link>

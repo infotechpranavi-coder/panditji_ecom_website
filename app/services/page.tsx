@@ -112,7 +112,12 @@ function ServicesContent() {
             
             const searchText = searchQuery.toLowerCase()
             
-            // Create a comprehensive blob of all searchable text for this puja
+            // Strict matching: only matching against name or category for standard search
+            const matchesSearch = !searchText || 
+                puja.name.toLowerCase().includes(searchText) || 
+                puja.category.toLowerCase().includes(searchText)
+            
+            // Comprehensive blob reserved just for deeper environmental filters (City / Lang)
             const searchBlob = [
                 puja.name,
                 puja.category,
@@ -122,8 +127,6 @@ function ServicesContent() {
                 (puja.features || []).join(' ')
             ].join(' ').toLowerCase()
 
-            // Check if ANY of the filters match the search blob
-            const matchesSearch = !searchText || searchBlob.includes(searchText)
             const matchesCity = !urlCity || searchBlob.includes(urlCity)
             const matchesLang = !urlLang || searchBlob.includes(urlLang)
             

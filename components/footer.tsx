@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, Phone, Smartphone, Mail } from 'lucide-react'
 
 export function Footer() {
@@ -86,9 +87,16 @@ export function Footer() {
         <div className="py-12 border-b border-white/20">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-extrabold text-2xl mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                ✨ Book Panditji Seva
-              </h3>
+              <div className="flex items-center mb-6">
+                <div className="relative w-32 h-32 group flex-shrink-0">
+                  <Image 
+                    src="/image.png" 
+                    alt="Book Panditji Seva Logo" 
+                    fill 
+                    className="object-contain object-left group-hover:scale-105 transition-transform origin-left" 
+                  />
+                </div>
+              </div>
               <p className="text-sm opacity-95 leading-relaxed">
                 Bringing authentic Online Puja services to your home with devotion and grace (Panditji Seva)
               </p>
