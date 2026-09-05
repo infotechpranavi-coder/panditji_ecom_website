@@ -92,57 +92,57 @@ export default function Home() {
 
       {/* Hero Section - Conditional Rendering */}
       {heroBanner ? (
-        // Dynamic Hero Banner
-        <section className="relative min-h-[220px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
-          {/* Background Image - Made Clickable */}
-          <Link href="/services" className="absolute inset-0 z-0">
+        // Dynamic Hero Banner — full image fits viewport width (no crop/zoom)
+        <section className="relative w-full overflow-hidden bg-muted/20">
+          <Link href="/services" className="block w-full">
             <img
               src={heroBanner.imageUrl}
-              alt={heroBanner.title}
-              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              alt={heroBanner.title || 'Hero banner'}
+              className="w-full h-auto block"
             />
-            {/* Overlay removed as per user request */}
           </Link>
 
-          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pt-8 pb-8 md:pt-20 md:pb-16">
-            {(heroBanner.title || heroBanner.description) && (
-              <div className="space-y-6 max-w-4xl mx-auto">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-4 animate-fade-in">
-                  <Sparkles className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-bold text-white">Online Puja & e-Puja Services</span>
-                </div>
+          {(heroBanner.title || heroBanner.description) && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                <div className="space-y-6 max-w-4xl mx-auto">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-4 animate-fade-in">
+                    <Sparkles className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-bold text-white">Online Puja & e-Puja Services</span>
+                  </div>
 
-                {heroBanner.title && (
-                  <h1 className="text-3xl md:text-7xl font-black text-white leading-tight drop-shadow-lg tracking-tight mb-4">
-                    {heroBanner.title}
-                  </h1>
-                )}
+                  {heroBanner.title && (
+                    <h1 className="text-3xl md:text-7xl font-black text-white leading-tight drop-shadow-lg tracking-tight mb-4">
+                      {heroBanner.title}
+                    </h1>
+                  )}
 
-                {heroBanner.description && (
-                  <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md mb-6">
-                    {heroBanner.description}
-                  </p>
-                )}
+                  {heroBanner.description && (
+                    <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md mb-6">
+                      {heroBanner.description}
+                    </p>
+                  )}
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                  <Link
-                    href="/services"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                  >
-                    <span>Explore Services</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                  <Link
-                    href="tel:+917021324717"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 hover:scale-105 transition-all duration-300"
-                  >
-                    <Phone className="w-5 h-5" />
-                    <span>Contact Us</span>
-                  </Link>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                    <Link
+                      href="/services"
+                      className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                    >
+                      <span>Explore Services</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
+                    <Link
+                      href="tel:+917021324717"
+                      className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 hover:scale-105 transition-all duration-300"
+                    >
+                      <Phone className="w-5 h-5" />
+                      <span>Contact Us</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </section>
       ) : (
         // Fallback: Original Creative Asymmetric Layout

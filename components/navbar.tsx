@@ -113,27 +113,31 @@ export function Navbar() {
       {/* Main Header */}
       <div className="bg-background border-b border-border/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 gap-6">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-              <div className="relative w-20 h-20 group-hover:scale-110 transition-transform">
+          <div className="flex items-center justify-start h-20 gap-4">
+            {/* Logo — icon + name side by side, left-aligned */}
+            <Link href="/" className="flex items-center gap-1.5 flex-shrink-0 group py-0.5 -ml-1">
+              <div className="relative h-[68px] w-[68px] group-hover:scale-105 transition-transform">
                 <Image 
-                  src="/pandit_only logo.png" 
-                  alt="Book Panditji Seva Logo" 
+                  src="/logo/bookpandit_logoonlu%20.png" 
+                  alt="Book Panditji icon" 
                   fill 
                   className="object-contain" 
+                  priority
                 />
               </div>
-              <div className="flex flex-col pt-3">
-                <div className="flex items-center gap-1">
-                  <span className="text-xl md:text-2xl font-black text-primary">Book Panditji</span>
-                  <span className="text-xl md:text-2xl font-black text-accent">Seva</span>
-                </div>
+              <div className="relative h-[44px] w-[130px] group-hover:scale-105 transition-transform">
+                <Image 
+                  src="/logo/bookpandit_log-name.png" 
+                  alt="Book Panditji name" 
+                  fill 
+                  className="object-contain object-left" 
+                  priority
+                />
               </div>
             </Link>
 
             {/* Search Section */}
-            <div className="flex-1 flex flex-col max-w-4xl hidden md:flex pt-1 pb-1">
+            <div className="flex-1 flex flex-col max-w-4xl hidden md:flex pt-1 pb-1 ml-2">
 
               {searchType === 'puja' ? (
                 <div className="flex items-end gap-3">
@@ -273,7 +277,7 @@ export function Navbar() {
             </div>
 
             {/* User Actions / Search Toggle */}
-            <div className="flex items-center gap-4 flex-shrink-0">
+            <div className="flex items-center gap-4 flex-shrink-0 ml-auto">
               {/* Search Mode Toggle */}
               <div className="hidden md:flex bg-muted/60 p-0.5 rounded-full w-fit border border-border/50 shadow-sm">
                 <button

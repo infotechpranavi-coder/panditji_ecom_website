@@ -194,13 +194,18 @@ export function BannerManager() {
 
                         <div>
                             <label className="block text-sm font-medium mb-1">Banner Image</label>
+                            <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
+                                Recommended size: <span className="font-semibold text-foreground">1920 × 600 px</span> (widescreen).
+                                Min: 1200 × 400 px. Use JPG/PNG/WebP. Image shows full width with no crop.
+                            </p>
                             <div className="border-2 border-dashed border-border rounded-xl h-48 flex flex-col items-center justify-center p-4 relative bg-muted/20 hover:bg-muted/30 transition-colors">
                                 {imageUrl ? (
-                                    <img src={imageUrl} alt="Preview" className="h-full w-full object-cover rounded-lg" />
+                                    <img src={imageUrl} alt="Preview" className="h-full w-full object-contain rounded-lg" />
                                 ) : (
                                     <div className="text-center text-muted-foreground">
                                         <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
                                         <p className="text-sm">Click to upload or drag and drop</p>
+                                        <p className="text-xs mt-1 opacity-80">1920 × 600 px recommended</p>
                                     </div>
                                 )}
                                 <input
@@ -252,8 +257,8 @@ export function BannerManager() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {banners.map((banner) => (
                             <div key={banner._id} className={`relative group rounded-xl border-2 overflow-hidden transition-all ${banner.isActive ? 'border-primary ring-2 ring-primary/20' : 'border-border opacity-70 hover:opacity-100'}`}>
-                                <div className="aspect-video bg-muted relative">
-                                    <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
+                                <div className="aspect-[1920/600] bg-muted relative">
+                                    <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-contain" />
                                     {banner.isActive && (
                                         <div className="absolute top-2 right-2 px-2 py-1 bg-primary text-white text-xs font-bold rounded-md shadow-sm flex items-center gap-1">
                                             <CheckCircle className="w-3 h-3" /> Active

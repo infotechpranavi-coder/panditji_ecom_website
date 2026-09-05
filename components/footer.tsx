@@ -88,9 +88,9 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center mb-6">
-                <div className="relative w-32 h-32 group flex-shrink-0">
+                <div className="relative w-72 h-40 group flex-shrink-0">
                   <Image 
-                    src="/image.png" 
+                    src="/logo/bookpandit%20log.png" 
                     alt="Book Panditji Seva Logo" 
                     fill 
                     className="object-contain object-left group-hover:scale-105 transition-transform origin-left" 
