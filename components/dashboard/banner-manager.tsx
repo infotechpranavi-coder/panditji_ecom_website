@@ -1,8 +1,7 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Upload, Trash2, CheckCircle, XCircle, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { Upload, Trash2, CheckCircle, Image as ImageIcon, Loader2, ArrowUp, ArrowDown } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Banner {
@@ -11,16 +10,19 @@ interface Banner {
     description: string
     imageUrl: string
     isActive: boolean
+    sequence: number
 }
 
 export function BannerManager() {
     const [banners, setBanners] = useState<Banner[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isUploading, setIsUploading] = useState(false)
+    const [updatingId, setUpdatingId] = useState<string | null>(null)
 
     // Form State
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [sequence, setSequence] = useState(1)
     const [imageUrl, setImageUrl] = useState('')
     const [file, setFile] = useState<File | null>(null)
 
@@ -33,7 +35,10 @@ export function BannerManager() {
             const response = await fetch('/api/banners')
             if (response.ok) {
                 const data = await response.json()
-                setBanners(data)
+                const list = Array.isArray(data) ? data : []
+                setBanners(list)
+                const maxSeq = list.reduce((max: number, b: Banner) => Math.max(max, Number(b.sequence) || 0), 0)
+                setSequence(maxSeq + 1)
             }
         } catch (error) {
             console.error('Error fetching banners:', error)
@@ -46,7 +51,6 @@ export function BannerManager() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setFile(e.target.files[0])
-            // Create a preview URL
             const url = URL.createObjectURL(e.target.files[0])
             setImageUrl(url)
         }
@@ -58,7 +62,7 @@ export function BannerManager() {
                 toast.error('Please select an image')
                 return null
             }
-            return imageUrl // Return existing URL if manually entered
+            return imageUrl
         }
 
         const formData = new FormData()
@@ -99,18 +103,18 @@ export function BannerManager() {
                     title,
                     description,
                     imageUrl: uploadedUrl,
-                    isActive: true, // Default to active for new implementations usually
+                    sequence: Number(sequence) || 1,
+                    isActive: true,
                 }),
             })
 
             if (response.ok) {
                 toast.success('Banner added successfully')
-                fetchBanners()
-                // Reset form
                 setTitle('')
                 setDescription('')
                 setImageUrl('')
                 setFile(null)
+                fetchBanners()
             } else {
                 toast.error('Failed to save banner')
             }
@@ -155,6 +159,64 @@ export function BannerManager() {
         }
     }
 
+    const updateSequence = async (banner: Banner, nextSequence: number) => {
+        if (!Number.isFinite(nextSequence) || nextSequence < 1) {
+            toast.error('Sequence must be 1 or higher')
+            return
+        }
+
+        setUpdatingId(banner._id)
+        try {
+            const response = await fetch(`/api/banners/${banner._id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sequence: nextSequence }),
+            })
+
+            if (response.ok) {
+                toast.success('Sequence updated')
+                fetchBanners()
+            } else {
+                toast.error('Failed to update sequence')
+            }
+        } catch (error) {
+            toast.error('Failed to update sequence')
+        } finally {
+            setUpdatingId(null)
+        }
+    }
+
+    const moveSequence = async (banner: Banner, direction: 'up' | 'down') => {
+        const sorted = [...banners].sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
+        const index = sorted.findIndex((b) => b._id === banner._id)
+        if (index < 0) return
+
+        const swapWith = direction === 'up' ? sorted[index - 1] : sorted[index + 1]
+        if (!swapWith) return
+
+        setUpdatingId(banner._id)
+        try {
+            await Promise.all([
+                fetch(`/api/banners/${banner._id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sequence: swapWith.sequence || 1 }),
+                }),
+                fetch(`/api/banners/${swapWith._id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sequence: banner.sequence || 1 }),
+                }),
+            ])
+            toast.success('Sequence updated')
+            fetchBanners()
+        } catch (error) {
+            toast.error('Failed to reorder banners')
+        } finally {
+            setUpdatingId(null)
+        }
+    }
+
     return (
         <div className="space-y-8">
             {/* Add New Banner Section */}
@@ -164,7 +226,7 @@ export function BannerManager() {
                     Add Hero Banner
                 </h2>
                 <p className="text-sm text-muted-foreground -mt-4 mb-6">
-                    Upload multiple banners — all marked active will rotate in the homepage hero slider.
+                    Upload multiple banners — sequence controls slider order (1 = first).
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -188,6 +250,19 @@ export function BannerManager() {
                                     placeholder="Short subtitle for the banner"
                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary bg-background h-24"
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Sequence</label>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={sequence}
+                                    onChange={(e) => setSequence(Number(e.target.value) || 1)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary bg-background"
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Lower number shows first in the homepage slider.
+                                </p>
                             </div>
                         </div>
 
@@ -241,7 +316,10 @@ export function BannerManager() {
 
             {/* Existing Banners List */}
             <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-border shadow-sm">
-                <h2 className="text-xl font-bold mb-6">Existing Banners</h2>
+                <h2 className="text-xl font-bold mb-2">Existing Banners</h2>
+                <p className="text-sm text-muted-foreground mb-6">
+                    Sorted by sequence. Use arrows or edit the number to change slider order.
+                </p>
 
                 {isLoading ? (
                     <div className="flex justify-center p-8">
@@ -254,10 +332,13 @@ export function BannerManager() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {banners.map((banner) => (
+                        {banners.map((banner, index) => (
                             <div key={banner._id} className={`relative group rounded-xl border-2 overflow-hidden transition-all ${banner.isActive ? 'border-primary ring-2 ring-primary/20' : 'border-border opacity-70 hover:opacity-100'}`}>
                                 <div className="aspect-[1920/600] bg-muted relative">
                                     <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-contain" />
+                                    <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded-md shadow-sm">
+                                        Seq {banner.sequence ?? index + 1}
+                                    </div>
                                     {banner.isActive && (
                                         <div className="absolute top-2 right-2 px-2 py-1 bg-primary text-white text-xs font-bold rounded-md shadow-sm flex items-center gap-1">
                                             <CheckCircle className="w-3 h-3" /> Active
@@ -265,10 +346,51 @@ export function BannerManager() {
                                     )}
                                 </div>
                                 <div className="p-4 bg-background">
-                                    <h3 className="font-bold text-lg mb-1 truncate">{banner.title}</h3>
-                                    <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-4">
+                                    <h3 className="font-bold text-lg mb-1 truncate">{banner.title || 'Untitled banner'}</h3>
+                                    <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-3">
                                         {banner.description || 'No description'}
                                     </p>
+
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">Sequence</label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            defaultValue={banner.sequence ?? index + 1}
+                                            key={`${banner._id}-${banner.sequence}`}
+                                            onBlur={(e) => {
+                                                const next = Number(e.target.value)
+                                                if (next !== banner.sequence) {
+                                                    updateSequence(banner, next)
+                                                }
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.currentTarget.blur()
+                                                }
+                                            }}
+                                            disabled={updatingId === banner._id}
+                                            className="w-20 px-2 py-1.5 border rounded-lg text-sm focus:outline-none focus:border-primary bg-background"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => moveSequence(banner, 'up')}
+                                            disabled={index === 0 || updatingId === banner._id}
+                                            className="p-1.5 rounded-lg border hover:bg-muted disabled:opacity-40"
+                                            title="Move earlier"
+                                        >
+                                            <ArrowUp className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => moveSequence(banner, 'down')}
+                                            disabled={index === banners.length - 1 || updatingId === banner._id}
+                                            className="p-1.5 rounded-lg border hover:bg-muted disabled:opacity-40"
+                                            title="Move later"
+                                        >
+                                            <ArrowDown className="w-4 h-4" />
+                                        </button>
+                                    </div>
 
                                     <div className="flex items-center justify-between gap-3">
                                         <button

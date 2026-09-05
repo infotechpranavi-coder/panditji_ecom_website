@@ -10,12 +10,11 @@ export async function GET(req: NextRequest) {
         const activeOnly = searchParams.get('active') === 'true'
 
         if (activeOnly) {
-            // All active banners for homepage slider (oldest first so order is stable)
-            const banners = await Banner.find({ isActive: true }).sort({ createdAt: 1 })
+            const banners = await Banner.find({ isActive: true }).sort({ sequence: 1, createdAt: 1 })
             return NextResponse.json(banners)
         }
 
-        const banners = await Banner.find({}).sort({ createdAt: -1 })
+        const banners = await Banner.find({}).sort({ sequence: 1, createdAt: 1 })
         return NextResponse.json(banners)
     } catch (error) {
         console.error('Error fetching banners:', error)
@@ -32,9 +31,15 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json()
 
-        // New banners default to active so they appear in the homepage slider
+        let sequence = Number(body.sequence)
+        if (!Number.isFinite(sequence) || sequence < 1) {
+            const last = await Banner.findOne({}).sort({ sequence: -1 }).select('sequence')
+            sequence = (last?.sequence || 0) + 1
+        }
+
         const banner = await Banner.create({
             ...body,
+            sequence,
             isActive: body.isActive !== undefined ? body.isActive : true,
         })
 
