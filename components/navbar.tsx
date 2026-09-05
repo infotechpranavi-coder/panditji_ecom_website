@@ -7,11 +7,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AuthModal } from './auth-modal'
+import { useT } from './language-provider'
+import { localizeField } from '@/lib/i18n/localize'
+import { useLocalizedContent, useAutoText } from '@/components/translated-text'
 
 interface Category {
   id: string
   _id?: string
   name: string
+  nameHi?: string
+  nameMr?: string
   slug: string
   description?: string
   showOnNavbar?: boolean
@@ -19,17 +24,52 @@ interface Category {
   isProduct?: boolean
 }
 
+function NavCategoryLink({
+  category,
+  mobile = false,
+}: {
+  category: Category
+  mobile?: boolean
+}) {
+  const name = useLocalizedContent(category as any, 'name')
+  const href = category.isProduct
+    ? `/pujan-samagri?category=${category.slug}`
+    : `/services?category=${category.slug}`
+
+  if (mobile) {
+    return (
+      <Link
+        href={href}
+        className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg"
+      >
+        {name}
+      </Link>
+    )
+  }
+
+  return (
+    <Link
+      href={href}
+      className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary"
+    >
+      {name}
+    </Link>
+  )
+}
+
 export function Navbar() {
+  const { t, locale, setLocale, locales } = useT()
   const [isOpen, setIsOpen] = useState(false)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [navbarCategories, setNavbarCategories] = useState<Category[]>([]) // Changed type to Category[]
+  const [navbarCategories, setNavbarCategories] = useState<Category[]>([])
   const [searchType, setSearchType] = useState<'puja' | 'samagri'>('puja')
   const [selectedCity, setSelectedCity] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('')
   const [isCityOpen, setIsCityOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
+  const [isSiteLangOpen, setIsSiteLangOpen] = useState(false)
   const router = useRouter()
 
   const performSearch = () => {
@@ -70,10 +110,12 @@ export function Navbar() {
         const categories: Category[] = await response.json() // Explicitly type categories
         // Only show categories that have showOnNavbar: true
         const navCategories = categories
-          .filter((cat: Category) => cat.showOnNavbar === true) // Use Category type
-          .map((cat: Category) => ({ // Use Category type
+          .filter((cat: Category) => cat.showOnNavbar === true)
+          .map((cat: Category) => ({
             id: cat.id || cat._id || '', 
-            name: cat.name || '', 
+            name: cat.name || '',
+            nameHi: cat.nameHi || '',
+            nameMr: cat.nameMr || '',
             slug: cat.slug || '', 
             description: cat.description || '',
             isService: cat.isService,
@@ -98,13 +140,47 @@ export function Navbar() {
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                <span className="font-medium">Call Us: +91 7021324717</span>
+                <span className="font-medium">{t.callUs}: +91 7021324717</span>
               </Link>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-muted-foreground/60">
-                <span className="font-bold text-[10px] uppercase tracking-widest">Language: Coming Soon</span>
-              </div>
+            <div className="relative flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsSiteLangOpen((v) => !v)}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border/60 bg-background/80 hover:border-primary hover:text-primary transition-colors text-[11px] font-bold uppercase tracking-wide"
+                aria-label={t.selectLanguage}
+              >
+                <Languages className="w-3.5 h-3.5" />
+                <span>{locales.find((l) => l.code === locale)?.nativeLabel || 'English'}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isSiteLangOpen ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {isSiteLangOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    className="absolute right-0 top-full mt-2 min-w-[140px] bg-white dark:bg-card border-2 border-border rounded-xl shadow-xl z-[70] overflow-hidden"
+                  >
+                    {locales.map((item) => (
+                      <button
+                        key={item.code}
+                        type="button"
+                        onClick={() => {
+                          setLocale(item.code)
+                          setIsSiteLangOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-primary/10 transition-colors ${
+                          locale === item.code ? 'bg-primary/10 text-primary' : 'text-foreground'
+                        }`}
+                      >
+                        <span className="font-bold">{item.nativeLabel}</span>
+                        <span className="text-muted-foreground text-xs ml-2">{item.label}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -143,7 +219,7 @@ export function Navbar() {
                 <div className="flex items-end gap-3">
                   {/* City Selector */}
                   <div className="flex-1 flex flex-col gap-1.5 min-w-0">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">Perform Pooja in</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">{t.performPoojaIn}</span>
                     <div className="relative">
                       <button
                         onClick={() => { setIsCityOpen(!isCityOpen); setIsLangOpen(false); }}
@@ -152,7 +228,7 @@ export function Navbar() {
                         <div className="flex items-center gap-2 truncate">
                           <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
                           <span className={`${!selectedCity ? 'text-muted-foreground italic' : ''} truncate`}>
-                            {selectedCity || 'Choose City'}
+                            {selectedCity || t.chooseCity}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isCityOpen ? 'rotate-180' : ''}`} />
@@ -166,7 +242,7 @@ export function Navbar() {
                             exit={{ opacity: 0, y: 10 }}
                             className="absolute top-full left-0 mt-2 w-96 bg-white dark:bg-card p-6 rounded-2xl border-2 border-border shadow-2xl z-[60]"
                           >
-                            <h4 className="text-primary font-bold mb-4">Select Your City</h4>
+                            <h4 className="text-primary font-bold mb-4">{t.selectYourCity}</h4>
                             <div className="flex flex-wrap gap-2 mb-6">
                               {cities.map((city) => (
                                 <button
@@ -179,15 +255,15 @@ export function Navbar() {
                               ))}
                             </div>
                             <div className="border-t border-border pt-4">
-                              <h4 className="text-primary font-bold mb-2">For International And Other Indian City Users</h4>
+                              <h4 className="text-primary font-bold mb-2">{t.forInternationalUsers}</h4>
                               <button
                                 onClick={() => { setSelectedCity('Online E-Puja'); setIsCityOpen(false); }}
                                 className={`px-4 py-2 rounded-lg border text-sm font-bold flex items-center gap-2 ${selectedCity === 'Online E-Puja' ? 'bg-primary text-white border-primary' : 'border-primary text-primary hover:bg-primary/5'}`}
                               >
-                                Online E-Puja (Zoom/Recording)
+                                {t.onlineEPuja}
                               </button>
                               <p className="text-[10px] text-muted-foreground mt-2 leading-tight">
-                                (For Devotees who are unable to participate in the Pooja. Prasad will be sent via Courier and the Pooja will be Streamed Live or Recorded)
+                                {t.onlineEPujaNote}
                               </p>
                             </div>
                           </motion.div>
@@ -198,7 +274,7 @@ export function Navbar() {
 
                   {/* Language Selector */}
                   <div className="w-44 flex flex-col gap-1.5 flex-shrink-0">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">Priest Preference</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">{t.priestPreference}</span>
                     <div className="relative">
                       <button
                         onClick={() => { setIsLangOpen(!isLangOpen); setIsCityOpen(false); }}
@@ -207,7 +283,7 @@ export function Navbar() {
                         <div className="flex items-center gap-2 truncate">
                           <Languages className="w-4 h-4 text-primary flex-shrink-0" />
                           <span className={`${!selectedLanguage ? 'text-muted-foreground italic' : ''} truncate`}>
-                            {selectedLanguage || 'Choose Lang'}
+                            {selectedLanguage || t.chooseLang}
                           </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isLangOpen ? 'rotate-180' : ''}`} />
@@ -240,12 +316,12 @@ export function Navbar() {
 
                   {/* Puja Text Search Input */}
                   <div className="flex-[1.2] flex flex-col gap-1.5 min-w-0">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">Search Puja Services</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase leading-none px-1 text-nowrap">{t.searchPujaServices}</span>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input
                         type="text"
-                        placeholder="Search... (Press Enter)"
+                        placeholder={t.searchPlaceholder}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handlePujaSearch}
@@ -264,7 +340,7 @@ export function Navbar() {
                 <div className="relative w-full">
                   <input
                     type="text"
-                    placeholder="Find Rudraksha, Gems, Samagri..."
+                    placeholder={t.searchSamagriPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full px-4 py-2.5 border-2 border-border rounded-l-lg focus:outline-none focus:border-primary bg-background"
@@ -284,13 +360,13 @@ export function Navbar() {
                   onClick={() => setSearchType('puja')}
                   className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all ${searchType === 'puja' ? 'bg-primary text-white shadow-sm' : 'hover:bg-primary/10 text-muted-foreground'}`}
                 >
-                  Pooja Services
+                  {t.poojaServices}
                 </button>
                 <button
                   onClick={() => setSearchType('samagri')}
                   className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all ${searchType === 'samagri' ? 'bg-primary text-white shadow-sm' : 'hover:bg-primary/10 text-muted-foreground'}`}
                 >
-                  Pujan Samagri
+                  {t.pujanSamagri}
                 </button>
               </div>
               <Link 
@@ -298,7 +374,7 @@ export function Navbar() {
                 className="hidden md:flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-primary to-accent text-white rounded-full text-xs font-black shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all animate-pulse"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>ONLINE PUJA</span>
+                <span>{t.onlinePuja}</span>
               </Link>
               <button
                 className="md:hidden p-2 hover:bg-primary/10 rounded-lg text-primary"
@@ -342,13 +418,13 @@ export function Navbar() {
                   onClick={() => setSearchType('puja')}
                   className={`flex-1 py-2 rounded-lg text-xs uppercase tracking-wider font-extrabold transition-all ${searchType === 'puja' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground'}`}
                 >
-                  Pooja Services
+                  {t.poojaServices}
                 </button>
                 <button
                   onClick={() => setSearchType('samagri')}
                   className={`flex-1 py-2 rounded-lg text-xs uppercase tracking-wider font-extrabold transition-all ${searchType === 'samagri' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground'}`}
                 >
-                  Pujan Samagri
+                  {t.pujanSamagri}
                 </button>
               </div>
 
@@ -358,7 +434,7 @@ export function Navbar() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder={searchType === 'puja' ? "Search for Puja Services..." : "Find Rudraksha, Gems, Samagri..."}
+                    placeholder={searchType === 'puja' ? t.searchPujaPlaceholder : t.searchSamagriPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={searchType === 'puja' ? handlePujaSearch : undefined}
@@ -471,28 +547,22 @@ export function Navbar() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="hidden md:flex items-center gap-8 h-12">
             <Link href="/" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Home
+              {t.home}
             </Link>
             <Link href="/about" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              About Us
+              {t.aboutUs}
             </Link>
             <Link href="/astrology" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Astrological Predictions
+              {t.astrologicalPredictions}
             </Link>
             {navbarCategories.map((category) => (
-              <Link
-                key={category.id}
-                href={category.isProduct ? `/pujan-samagri?category=${category.slug}` : `/services?category=${category.slug}`}
-                className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary"
-              >
-                {category.name}
-              </Link>
+              <NavCategoryLink key={category.id} category={category} />
             ))}
             <Link href="/gallery" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Gallery
+              {t.gallery}
             </Link>
             <Link href="/contact" className="text-sm font-bold hover:text-primary transition-colors py-3 border-b-2 border-transparent hover:border-primary">
-              Contact
+              {t.contact}
             </Link>
           </div>
 
@@ -500,35 +570,29 @@ export function Navbar() {
           {isOpen && (
             <div className="md:hidden pb-4 space-y-2">
               <Link href="/" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Home
+                {t.home}
               </Link>
               <Link href="/about" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                About Us
+                {t.aboutUs}
               </Link>
               <Link href="/astrology" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Astrological Predictions
+                {t.astrologicalPredictions}
               </Link>
               {navbarCategories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={category.isProduct ? `/pujan-samagri?category=${category.slug}` : `/services?category=${category.slug}`}
-                  className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg"
-                >
-                  {category.name}
-                </Link>
+                <NavCategoryLink key={category.id} category={category} mobile />
               ))}
               <Link href="/gallery" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Gallery
+                {t.gallery}
               </Link>
               <Link href="/contact" className="block px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg">
-                Contact
+                {t.contact}
               </Link>
               <Link
                 href="/contact?subject=Online Puja"
                 className="block mx-4 py-3 text-sm font-black text-white bg-gradient-to-r from-primary to-accent rounded-xl text-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all mt-2"
                 onClick={() => setIsOpen(false)}
               >
-                ONLINE PUJA
+                {t.onlinePuja}
               </Link>
               <button
                 onClick={() => {
@@ -537,7 +601,7 @@ export function Navbar() {
                 }}
                 className="block w-full text-left px-4 py-2 text-sm font-medium hover:text-primary hover:bg-primary/10 rounded-lg"
               >
-                Log in / Register
+                {t.loginRegister}
               </button>
             </div>
           )}

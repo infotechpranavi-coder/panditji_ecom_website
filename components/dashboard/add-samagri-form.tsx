@@ -5,12 +5,16 @@ import { Plus, Upload, X, ImageIcon } from 'lucide-react'
 
 interface SamagriFormData {
     name: string
+    nameHi: string
+    nameMr: string
     price: number
     discount: number
     category: string
     categorySlug: string
     image: string | null
     description: string
+    descriptionHi: string
+    descriptionMr: string
     sku: string
     stockStatus: 'in_stock' | 'out_of_stock'
 }
@@ -29,12 +33,16 @@ interface AddSamagriFormProps {
 export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormProps) {
     const [formData, setFormData] = useState<SamagriFormData>({
         name: '',
+        nameHi: '',
+        nameMr: '',
         price: 0,
         discount: 0,
         category: '',
         categorySlug: '',
         image: null,
         description: '',
+        descriptionHi: '',
+        descriptionMr: '',
         sku: '',
         stockStatus: 'in_stock',
     })
@@ -50,12 +58,16 @@ export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormP
         if (editingSamagri) {
             setFormData({
                 name: editingSamagri.name || '',
+                nameHi: editingSamagri.nameHi || '',
+                nameMr: editingSamagri.nameMr || '',
                 price: editingSamagri.price || 0,
                 discount: editingSamagri.discount || 0,
                 category: editingSamagri.category || '',
                 categorySlug: editingSamagri.categorySlug || '',
                 image: editingSamagri.image || null,
                 description: editingSamagri.description || '',
+                descriptionHi: editingSamagri.descriptionHi || '',
+                descriptionMr: editingSamagri.descriptionMr || '',
                 sku: editingSamagri.sku || '',
                 stockStatus: editingSamagri.stockStatus || 'in_stock',
             })
@@ -153,8 +165,8 @@ export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormP
                 onCancelEdit()
             } else {
                 setFormData({
-                    name: '', price: 0, discount: 0, category: '', categorySlug: '',
-                    image: null, description: '', sku: '', stockStatus: 'in_stock',
+                    name: '', nameHi: '', nameMr: '', price: 0, discount: 0, category: '', categorySlug: '',
+                    image: null, description: '', descriptionHi: '', descriptionMr: '', sku: '', stockStatus: 'in_stock',
                 })
             }
             window.location.reload()
@@ -180,12 +192,22 @@ export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormP
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-semibold mb-2">Item Name *</label>
+                        <label className="block text-sm font-semibold mb-2">Item Name (English) *</label>
                         <input type="text" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900" />
                     </div>
                     <div>
                         <label className="block text-sm font-semibold mb-2">SKU</label>
                         <input type="text" name="sku" value={formData.sku} onChange={handleInputChange} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900" />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-semibold mb-2">Item Name (हिन्दी)</label>
+                        <input type="text" name="nameHi" value={formData.nameHi} onChange={handleInputChange} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold mb-2">Item Name (मराठी)</label>
+                        <input type="text" name="nameMr" value={formData.nameMr} onChange={handleInputChange} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900" />
                     </div>
                 </div>
 
@@ -206,8 +228,18 @@ export function AddSamagriForm({ editingSamagri, onCancelEdit }: AddSamagriFormP
                 </div>
 
                 <div>
-                    <label className="block text-sm font-semibold mb-2">Description</label>
+                    <label className="block text-sm font-semibold mb-2">Description (English)</label>
                     <textarea name="description" value={formData.description} onChange={handleInputChange} rows={4} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900 resize-none" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-semibold mb-2">Description (हिन्दी)</label>
+                        <textarea name="descriptionHi" value={formData.descriptionHi} onChange={handleInputChange} rows={3} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900 resize-none" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold mb-2">Description (मराठी)</label>
+                        <textarea name="descriptionMr" value={formData.descriptionMr} onChange={handleInputChange} rows={3} className="w-full px-4 py-3 border-2 rounded-lg bg-white dark:bg-gray-900 resize-none" />
+                    </div>
                 </div>
 
                 <div>

@@ -8,8 +8,11 @@ import { WhatsAppButton } from '@/components/whatsapp-button'
 import { BookingModal } from '@/components/booking-modal'
 import { useState, useEffect } from 'react'
 import { ChevronRight, Facebook, Twitter, Linkedin, MessageCircle, Share2, Star, Check, Sparkles } from 'lucide-react'
+import { useT } from '@/components/language-provider'
+import { useLocalizedContent } from '@/components/translated-text'
 
 export default function PujaDetailPage() {
+  const { t, locale } = useT()
   const params = useParams()
   const id = params?.id as string
   const [puja, setPuja] = useState<any>(null)
@@ -24,6 +27,13 @@ export default function PujaDetailPage() {
     comment: ''
   })
   const [submittingReview, setSubmittingReview] = useState(false)
+
+  // Always call hooks (even when puja is null)
+  const displayName = useLocalizedContent(puja, 'name')
+  const displayShort = useLocalizedContent(puja, 'shortDescription')
+  const displayFullDesc = useLocalizedContent(puja, 'fullDescription')
+  const displayDesc = useLocalizedContent(puja, 'description')
+  const displayFull = displayFullDesc || displayDesc
 
   useEffect(() => {
     if (id) {
@@ -118,12 +128,12 @@ export default function PujaDetailPage() {
   }
 
   const handleWhatsAppBuy = () => {
-    const message = `Hi, I want to book: ${puja.name} - ₹${puja.price}`
+    const message = `Hi, I want to book: ${displayName} - ₹${puja.price}`
     window.open(`https://wa.me/917021324717?text=${encodeURIComponent(message)}`, '_blank')
   }
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const shareText = `Check out ${puja.name} on Book My Panditji`
+  const shareText = `Check out ${displayName} on Book My Panditji`
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -134,13 +144,13 @@ export default function PujaDetailPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <Link href="/" className="text-muted-foreground hover:text-foreground">Home</Link>
+              <Link href="/" className="text-muted-foreground hover:text-foreground">{t.home}</Link>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              <Link href="/gallery" className="text-muted-foreground hover:text-foreground">Gallery</Link>
+              <Link href="/gallery" className="text-muted-foreground hover:text-foreground">{t.gallery}</Link>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
               <Link href={`/gallery?category=${puja.categorySlug || 'pujas-vrat'}`} className="text-muted-foreground hover:text-foreground truncate max-w-[100px] sm:max-w-none">{puja.category}</Link>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-none">{puja.name}</span>
+              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-none">{displayName}</span>
             </div>
 
             {/* Social Sharing Icons */}
@@ -203,7 +213,7 @@ export default function PujaDetailPage() {
             <div>
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden mb-4 aspect-square flex items-center justify-center relative">
                 {puja.image && puja.image !== '/placeholder.jpg' ? (
-                  <img src={puja.image} alt={puja.name} className="w-full h-full object-cover" />
+                  <img src={puja.image} alt={displayName} className="w-full h-full object-cover" />
                 ) : (
                   <div className="text-9xl opacity-30">🙏</div>
                 )}
@@ -227,12 +237,11 @@ export default function PujaDetailPage() {
 
             {/* Right - Product Details */}
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900 dark:text-white">{puja.name}</h1>
-              <p className="text-sm text-muted-foreground mb-6">SKU: {puja.sku || `PUJA-${id}`}</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900 dark:text-white">{displayName}</h1>
 
               {/* Short Description */}
               <p className="text-base text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                {puja.shortDescription}
+                {displayShort}
               </p>
 
               {/* Japa Option */}
@@ -292,7 +301,7 @@ export default function PujaDetailPage() {
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
-                Description
+                {t.descriptionTab}
                 {activeTab === 'description' && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-[0_-2px_6px_rgba(var(--primary),0.3)]" />
                 )}
@@ -304,7 +313,7 @@ export default function PujaDetailPage() {
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
-                Specification
+                {t.specificationTab}
                 {activeTab === 'specification' && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-[0_-2px_6px_rgba(var(--primary),0.3)]" />
                 )}
@@ -316,7 +325,7 @@ export default function PujaDetailPage() {
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
-                Reviews ({puja.reviews?.length || 0})
+                {t.reviewsTab} ({puja.reviews?.length || 0})
                 {activeTab === 'reviews' && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-[0_-2px_6px_rgba(var(--primary),0.3)]" />
                 )}
@@ -328,7 +337,7 @@ export default function PujaDetailPage() {
                   : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
-                FAQ
+                {t.faqTab}
                 {activeTab === 'faq' && (
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-[0_-2px_6px_rgba(var(--primary),0.3)]" />
                 )}
@@ -340,7 +349,7 @@ export default function PujaDetailPage() {
           <div className="max-w-4xl mx-auto">
             {activeTab === 'description' && (
               <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line pb-12 text-base">
-                {puja.fullDescription || puja.description}
+                {displayFull || puja.description}
               </div>
             )}
 

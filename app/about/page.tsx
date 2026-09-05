@@ -5,8 +5,10 @@ import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { ChevronRight, Heart, Users, Award, Flame, User as UserIcon } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useT } from '@/components/language-provider'
 
 export default function AboutPage() {
+  const { t } = useT()
   const [teamMembers, setTeamMembers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -36,9 +38,9 @@ export default function AboutPage() {
       <div className="border-b border-border px-4">
         <div className="mx-auto max-w-7xl w-full py-4">
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-muted-foreground hover:text-foreground">Home</Link>
+            <Link href="/" className="text-muted-foreground hover:text-foreground">{t.home}</Link>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground font-medium">About Us</span>
+            <span className="text-foreground font-medium">{t.aboutUs}</span>
           </div>
         </div>
       </div>
@@ -49,13 +51,13 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,200,0,0.15),transparent_50%)]" />
         <div className="mx-auto max-w-7xl relative z-10">
           <div className="inline-block mb-4 md:mb-6 px-4 py-1 bg-primary/20 rounded-full">
-            <span className="text-xs font-semibold text-primary uppercase tracking-wide">About Us</span>
+            <span className="text-xs font-semibold text-primary uppercase tracking-wide">{t.aboutBadge}</span>
           </div>
           <h1 className="text-3xl md:text-7xl font-extrabold mb-6 md:mb-8 text-balance leading-tight">
-            Bridging <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">Sacred Traditions</span> with Modern Access
+            {t.aboutHeroTitle} <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">{t.aboutHeroHighlight}</span> {t.aboutHeroSuffix}
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl leading-relaxed">
-            Book My Panditji is dedicated to preserving and sharing authentic Indian temple traditions with devotees worldwide through innovative e-puja services, bringing spiritual ceremonies into the digital era.
+            {t.aboutHeroDesc}
           </p>
         </div>
       </section>
@@ -68,7 +70,7 @@ export default function AboutPage() {
               <div className="p-5 w-fit bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl mb-6 shadow-lg">
                 <Heart className="w-10 h-10 text-primary" />
               </div>
-              <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Our Mission</h2>
+              <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t.ourMission}</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed text-lg">
                 To make authentic Indian temple rituals, pujas, and spiritual services accessible to everyone through e-puja platforms, regardless of their location or lifestyle. We believe in the power of traditions and their ability to bring peace, prosperity, and spiritual growth to modern lives.
               </p>
@@ -80,7 +82,7 @@ export default function AboutPage() {
               <div className="p-5 w-fit bg-gradient-to-br from-accent/30 to-accent/10 rounded-xl mb-6 shadow-lg">
                 <Flame className="w-10 h-10 text-accent" />
               </div>
-              <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Our Vision</h2>
+              <h2 className="text-4xl font-extrabold mb-6 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">{t.ourVision}</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed text-lg">
                 To become the most trusted e-puja platform for authentic Indian spiritual services, where devotees can experience genuine rituals performed by qualified priests with deep knowledge of Vedic traditions through live virtual ceremonies.
               </p>
@@ -164,7 +166,7 @@ export default function AboutPage() {
               <span className="text-xs font-semibold text-primary uppercase tracking-wide">Team</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Our Team
+              {t.ourTeam}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Our team consists of experienced spiritual guides, certified priests, and service coordinators dedicated to bringing authentic traditions to your doorstep.

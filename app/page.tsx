@@ -7,6 +7,34 @@ import { CalendarWidget } from '@/components/calendar-widget'
 import { WhatsAppButton } from '@/components/whatsapp-button'
 import { ArrowRight, Phone, Calendar, Sparkles, CheckCircle2, Star, Flame, Heart, Shield, Clock, Users, Award, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useT } from '@/components/language-provider'
+import { useLocalizedContent } from '@/components/translated-text'
+import { localizeField } from '@/lib/i18n/localize'
+
+function LocalizedName({ item, field = 'name', className }: { item: any; field?: string; className?: string }) {
+  const text = useLocalizedContent(item, field)
+  return <span className={className}>{text}</span>
+}
+
+function HeroBannerSlide({
+  banner,
+  active,
+}: {
+  banner: any
+  active: boolean
+}) {
+  return (
+    <div className={active ? 'block' : 'hidden'}>
+      <Link href="/services?category=pujas-vrat" className="block w-full">
+        <img
+          src={banner.imageUrl}
+          alt={banner.title || 'Hero banner'}
+          className="w-full h-auto block"
+        />
+      </Link>
+    </div>
+  )
+}
 
 const festivalServices: any[] = []
 const pujaVratServices: any[] = []
@@ -14,6 +42,7 @@ const latestPujas: any[] = []
 const chakraBalancing: any[] = []
 
 export default function Home() {
+  const { t, locale } = useT()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [bannerIndex, setBannerIndex] = useState(0)
   const [pujas, setPujas] = useState<any[]>([])
@@ -105,37 +134,11 @@ export default function Home() {
         <section className="relative w-full overflow-hidden bg-muted/20">
           <div className="relative w-full">
             {heroBanners.map((banner, index) => (
-              <div
+              <HeroBannerSlide
                 key={banner._id || index}
-                className={index === bannerIndex ? 'block' : 'hidden'}
-              >
-                <Link href="/services" className="block w-full">
-                  <img
-                    src={banner.imageUrl}
-                    alt={banner.title || `Hero banner ${index + 1}`}
-                    className="w-full h-auto block"
-                  />
-                </Link>
-
-                {(banner.title || banner.description) && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
-                      <div className="space-y-4 max-w-4xl mx-auto">
-                        {banner.title && (
-                          <h1 className="text-3xl md:text-5xl font-black text-white leading-tight drop-shadow-lg tracking-tight">
-                            {banner.title}
-                          </h1>
-                        )}
-                        {banner.description && (
-                          <p className="text-base md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md">
-                            {banner.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                banner={banner}
+                active={index === bannerIndex}
+              />
             ))}
 
             {heroBanners.length > 1 && (
@@ -184,19 +187,19 @@ export default function Home() {
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-sm rounded-full border border-primary/20 shadow-lg">
                   <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                  <span className="text-sm font-bold text-primary">✨ Online e-Puja Services</span>
+                  <span className="text-sm font-bold text-primary">✨ {t.onlineEPujaServices}</span>
                 </div>
 
                 {/* Main Heading */}
                 <div className="space-y-4">
                   <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight">
-                    Connect with{' '}
+                    {t.connectWith}{' '}
                     <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                      Divine Traditions
+                      {t.divineTraditions}
                     </span>
                   </h1>
                   <p className="text-lg md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
-                    Book authentic e-puja and online puja services performed by certified priests. Experience sacred rituals from anywhere, anytime.
+                    {t.homeHeroDesc}
                   </p>
                 </div>
 
@@ -206,7 +209,7 @@ export default function Home() {
                     href="/services"
                     className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
                   >
-                    <span>Explore Services</span>
+                    <span>{t.exploreServices}</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
@@ -214,7 +217,7 @@ export default function Home() {
                     className="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white dark:text-gray-200 rounded-xl font-bold text-lg hover:bg-gray-100/10 hover:scale-105 transition-all duration-300 inline-flex items-center justify-center shadow-lg transform"
                   >
                     <Phone className="w-5 h-5 mr-2" />
-                    Call: +91 7021324717
+                    {t.callUs}: +91 7021324717
                   </Link>
                 </div>
 
@@ -299,7 +302,7 @@ export default function Home() {
                   >
                     <div className="relative h-52 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 flex items-center justify-center overflow-hidden">
                       {service.image && service.image !== '/placeholder.jpg' ? (
-                        <img src={service.image} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                        <img src={service.image} alt={localizeField(service, 'name', locale)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                       ) : (
                         <>
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,200,0,0.1),transparent)]" />
@@ -309,10 +312,10 @@ export default function Home() {
                     </div>
                     <div className="p-6 flex-1 flex flex-col bg-white dark:bg-card">
                       <h3 className="font-bold text-lg mb-2 text-primary group-hover:text-accent transition-colors line-clamp-1">
-                        {service.name}
+                        <LocalizedName item={service} />
                       </h3>
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[2.5rem]">
-                        {service.shortDescription || 'Experience the divine blessings of this sacred puja ritual'}
+                        {localizeField(service, 'shortDescription', locale) || 'Experience the divine blessings of this sacred puja ritual'}
                       </p>
                       <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
                         <span className="text-sm font-bold text-primary">View Details</span>
@@ -376,7 +379,7 @@ export default function Home() {
                     )}
                     <div className={`relative ${isLarge ? 'h-56' : 'h-44'} bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden`}>
                       {service.image && service.image !== '/placeholder.jpg' ? (
-                        <img src={service.image} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                        <img src={service.image} alt={localizeField(service, 'name', locale)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                       ) : (
                         <>
                           <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
@@ -386,10 +389,10 @@ export default function Home() {
                     </div>
                     <div className={`${isLarge ? 'p-6' : 'p-5'} bg-white dark:bg-card`}>
                       <h3 className={`font-bold ${isLarge ? 'text-xl' : 'text-lg'} mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1`}>
-                        {service.name}
+                        <LocalizedName item={service} />
                       </h3>
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {service.shortDescription || 'Authentic traditional rituals performed by experts'}
+                        {localizeField(service, 'shortDescription', locale) || 'Authentic traditional rituals performed by experts'}
                       </p>
                       <div className="flex items-center justify-between pt-3 border-t border-border/50">
                         <span className="text-sm font-bold text-accent">View Details</span>
@@ -417,7 +420,7 @@ export default function Home() {
               <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Benefits</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
-              Why Choose Us?
+              {t.whyChooseUs}
             </h2>
             <p className="text-lg text-white/90 max-w-2xl">
               Experience the difference of authentic traditional services
@@ -427,9 +430,9 @@ export default function Home() {
           {/* Why Choose Us Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Shield, title: 'Certified Priests', desc: 'All priests are verified and certified' },
-              { icon: Clock, title: 'Flexible Timing', desc: 'Book at your convenience' },
-              { icon: Heart, title: 'Authentic Rituals', desc: 'Traditional methods preserved' },
+              { icon: Shield, title: t.certifiedPriests, desc: t.certifiedPriestsDesc },
+              { icon: Clock, title: t.flexibleTiming, desc: t.flexibleTimingDesc },
+              { icon: Heart, title: t.authenticRituals, desc: t.authenticRitualsDesc },
               { icon: Star, title: 'Satisfaction Guaranteed', desc: '100% authentic experience' },
             ].map((item, i) => (
               <div key={i} className="group bg-white/95 dark:bg-white/10 backdrop-blur-sm rounded-2xl p-8 border-2 border-white/20 card-elevated hover:border-white/40 hover:shadow-xl transition-all duration-300">
@@ -513,7 +516,7 @@ export default function Home() {
                         </div>
                         <div className="relative h-64 flex items-center justify-center p-8">
                           {largeCard.image && largeCard.image !== '/placeholder.jpg' ? (
-                            <img src={largeCard.image} alt={largeCard.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                            <img src={largeCard.image} alt={localizeField(largeCard, 'name', locale)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                           ) : (
                             <div className="text-9xl opacity-20 group-hover:opacity-30 transition-opacity">🕉️</div>
                           )}
@@ -521,11 +524,11 @@ export default function Home() {
                         </div>
                         <div className="p-6 bg-background/80 backdrop-blur-sm">
                           <h3 className="text-2xl font-bold mb-3 text-primary group-hover:text-accent transition-colors">
-                            {largeCard.name}
+                            {localizeField(largeCard, 'name', locale)}
                           </h3>
                           <p className="text-muted-foreground mb-4 line-clamp-2">
-                            {(largeCard.shortDescription || largeCard.description || 'Experience the divine blessings of this sacred festival puja').split(' ').slice(0, 4).join(' ')}
-                            {(largeCard.shortDescription || largeCard.description || '').split(' ').length > 4 ? '...' : ''}
+                            {(localizeField(largeCard, 'shortDescription', locale) || largeCard.description || 'Experience the divine blessings of this sacred festival puja').split(' ').slice(0, 4).join(' ')}
+                            {(localizeField(largeCard, 'shortDescription', locale) || largeCard.description || '').split(' ').length > 4 ? '...' : ''}
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-bold text-primary">View Details</span>
@@ -546,7 +549,7 @@ export default function Home() {
                       >
                         <div className="relative h-40 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 flex items-center justify-center overflow-hidden">
                           {smallCard1.image && smallCard1.image !== '/placeholder.jpg' ? (
-                            <img src={smallCard1.image} alt={smallCard1.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                            <img src={smallCard1.image} alt={localizeField(smallCard1, 'name', locale)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                           ) : (
                             <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">🕉️</div>
                           )}
@@ -554,10 +557,10 @@ export default function Home() {
                         </div>
                         <div className="p-5 flex-1 flex flex-col">
                           <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-1">
-                            {smallCard1.name}
+                            {localizeField(smallCard1, 'name', locale)}
                           </h3>
                           <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
-                            {smallCard1.shortDescription || smallCard1.name || 'Sacred traditional puja celebration'}
+                            {localizeField(smallCard1, 'shortDescription', locale) || localizeField(smallCard1, 'name', locale) || 'Sacred traditional puja celebration'}
                           </p>
                           <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
                             <span className="text-xs font-bold text-primary">View Details</span>
@@ -578,7 +581,7 @@ export default function Home() {
                       >
                         <div className="relative h-40 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 flex items-center justify-center overflow-hidden">
                           {smallCard2.image && smallCard2.image !== '/placeholder.jpg' ? (
-                            <img src={smallCard2.image} alt={smallCard2.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                            <img src={smallCard2.image} alt={localizeField(smallCard2, 'name', locale)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                           ) : (
                             <div className="text-6xl opacity-30 group-hover:scale-110 transition-transform duration-300">🕉️</div>
                           )}
@@ -586,10 +589,10 @@ export default function Home() {
                         </div>
                         <div className="p-5 flex-1 flex flex-col">
                           <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-1">
-                            {smallCard2.name}
+                            {localizeField(smallCard2, 'name', locale)}
                           </h3>
                           <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
-                            {smallCard2.shortDescription || 'Experience authentic Vedic traditions'}
+                            {localizeField(smallCard2, 'shortDescription', locale) || 'Experience authentic Vedic traditions'}
                           </p>
                           <div className="mt-auto pt-3 border-t border-border/50 flex items-center justify-between">
                             <span className="text-xs font-bold text-primary">View Details</span>
@@ -634,7 +637,7 @@ export default function Home() {
                 >
                   <div className="relative h-48 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-indigo-500/10 flex items-center justify-center overflow-hidden">
                     {service.image && service.image !== '/placeholder.jpg' ? (
-                      <img src={service.image} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      <img src={service.image} alt={localizeField(service, 'name', locale)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                     ) : (
                       <>
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.15),transparent)]" />
@@ -645,7 +648,7 @@ export default function Home() {
                   </div>
                   <div className="p-6 flex-1 flex flex-col bg-white dark:bg-card">
                     <h3 className="font-bold text-lg mb-3 text-gray-900 dark:text-primary group-hover:text-primary transition-colors line-clamp-2 min-h-[3.5rem]">
-                      {service.name}
+                      <LocalizedName item={service} />
                     </h3>
                     <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
                       <span className="text-sm font-bold text-primary">View Details</span>

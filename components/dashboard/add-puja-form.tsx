@@ -5,13 +5,19 @@ import { Plus, Upload, X, Image as ImageIcon, Video } from 'lucide-react'
 
 interface PujaFormData {
   name: string
+  nameHi: string
+  nameMr: string
   sku: string
   price: number
   priceLabel: string
   category: string
   categorySlug: string
   shortDescription: string
+  shortDescriptionHi: string
+  shortDescriptionMr: string
   fullDescription: string
+  fullDescriptionHi: string
+  fullDescriptionMr: string
   duration: string
   image: string | null
   video: string | null
@@ -36,13 +42,19 @@ interface AddPujaFormProps {
 export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
   const [formData, setFormData] = useState<PujaFormData>({
     name: '',
+    nameHi: '',
+    nameMr: '',
     sku: '',
     price: 0,
     priceLabel: 'From',
     category: '',
     categorySlug: '',
     shortDescription: '',
+    shortDescriptionHi: '',
+    shortDescriptionMr: '',
     fullDescription: '',
+    fullDescriptionHi: '',
+    fullDescriptionMr: '',
     duration: '',
     image: null,
     video: null,
@@ -52,6 +64,7 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
     faqs: [],
     reviews: [],
   })
+  const [contentLang, setContentLang] = useState<'en' | 'hi' | 'mr'>('en')
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
   const [currentFeature, setCurrentFeature] = useState('')
@@ -76,13 +89,19 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
     if (editingPuja) {
       setFormData({
         name: editingPuja.name || '',
+        nameHi: editingPuja.nameHi || '',
+        nameMr: editingPuja.nameMr || '',
         sku: editingPuja.sku || '',
         price: editingPuja.price || 0,
         priceLabel: editingPuja.priceLabel || 'From',
         category: editingPuja.category || '',
         categorySlug: editingPuja.categorySlug || '',
         shortDescription: editingPuja.shortDescription || '',
+        shortDescriptionHi: editingPuja.shortDescriptionHi || '',
+        shortDescriptionMr: editingPuja.shortDescriptionMr || '',
         fullDescription: editingPuja.fullDescription || editingPuja.description || '',
+        fullDescriptionHi: editingPuja.fullDescriptionHi || '',
+        fullDescriptionMr: editingPuja.fullDescriptionMr || '',
         duration: editingPuja.duration || '',
         image: editingPuja.image || null,
         video: editingPuja.video || null,
@@ -319,13 +338,19 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
       // Reset form
       setFormData({
         name: '',
+        nameHi: '',
+        nameMr: '',
         sku: '',
         price: 0,
         priceLabel: 'From',
         category: '',
         categorySlug: '',
         shortDescription: '',
+        shortDescriptionHi: '',
+        shortDescriptionMr: '',
         fullDescription: '',
+        fullDescriptionHi: '',
+        fullDescriptionMr: '',
         duration: '',
         image: null,
         video: null,
@@ -375,21 +400,83 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Puja Name *
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-            placeholder="e.g., Diwali Puja"
-            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-          />
+        {/* Multilingual content */}
+        <div className="rounded-xl border-2 border-border p-4 space-y-4 bg-muted/20">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-sm">Product Title & Details</h3>
+              <p className="text-xs text-muted-foreground">Add English, Hindi and Marathi so the website language switcher can show them.</p>
+            </div>
+            <div className="flex bg-background border rounded-lg p-0.5">
+              {([
+                { code: 'en', label: 'English' },
+                { code: 'hi', label: 'हिन्दी' },
+                { code: 'mr', label: 'मराठी' },
+              ] as const).map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => setContentLang(lang.code)}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                    contentLang === lang.code ? 'bg-primary text-white' : 'hover:bg-muted'
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {contentLang === 'en' && (
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold mb-2">Puja Name (English) *</label>
+                <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required placeholder="e.g., Diwali Puja" className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900" />
+              </div>
+              <div>
+                <label htmlFor="shortDescription" className="block text-sm font-semibold mb-2">Short Description (English) *</label>
+                <textarea id="shortDescription" name="shortDescription" value={formData.shortDescription} onChange={handleInputChange} required rows={2} placeholder="Brief description shown on product card..." className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 resize-none" />
+              </div>
+              <div>
+                <label htmlFor="fullDescription" className="block text-sm font-semibold mb-2">Full Description (English) *</label>
+                <textarea id="fullDescription" name="fullDescription" value={formData.fullDescription} onChange={handleInputChange} required rows={8} placeholder="Complete detailed description..." className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 resize-none" />
+              </div>
+            </div>
+          )}
+
+          {contentLang === 'hi' && (
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="nameHi" className="block text-sm font-semibold mb-2">पूजा नाम (हिन्दी)</label>
+                <input type="text" id="nameHi" name="nameHi" value={formData.nameHi} onChange={handleInputChange} placeholder="उदा., दिवाली पूजा" className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900" />
+              </div>
+              <div>
+                <label htmlFor="shortDescriptionHi" className="block text-sm font-semibold mb-2">संक्षिप्त विवरण (हिन्दी)</label>
+                <textarea id="shortDescriptionHi" name="shortDescriptionHi" value={formData.shortDescriptionHi} onChange={handleInputChange} rows={2} placeholder="कार्ड पर दिखने वाला संक्षिप्त विवरण..." className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 resize-none" />
+              </div>
+              <div>
+                <label htmlFor="fullDescriptionHi" className="block text-sm font-semibold mb-2">पूर्ण विवरण (हिन्दी)</label>
+                <textarea id="fullDescriptionHi" name="fullDescriptionHi" value={formData.fullDescriptionHi} onChange={handleInputChange} rows={8} placeholder="पूरा विस्तृत विवरण..." className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 resize-none" />
+              </div>
+            </div>
+          )}
+
+          {contentLang === 'mr' && (
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="nameMr" className="block text-sm font-semibold mb-2">पूजा नाव (मराठी)</label>
+                <input type="text" id="nameMr" name="nameMr" value={formData.nameMr} onChange={handleInputChange} placeholder="उदा., दिवाळी पूजा" className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900" />
+              </div>
+              <div>
+                <label htmlFor="shortDescriptionMr" className="block text-sm font-semibold mb-2">संक्षिप्त वर्णन (मराठी)</label>
+                <textarea id="shortDescriptionMr" name="shortDescriptionMr" value={formData.shortDescriptionMr} onChange={handleInputChange} rows={2} placeholder="कार्डवर दिसणारे संक्षिप्त वर्णन..." className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 resize-none" />
+              </div>
+              <div>
+                <label htmlFor="fullDescriptionMr" className="block text-sm font-semibold mb-2">पूर्ण वर्णन (मराठी)</label>
+                <textarea id="fullDescriptionMr" name="fullDescriptionMr" value={formData.fullDescriptionMr} onChange={handleInputChange} rows={8} placeholder="संपूर्ण तपशीलवार वर्णन..." className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 resize-none" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* SKU */}
@@ -405,40 +492,6 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
             onChange={handleInputChange}
             placeholder="e.g., DP-001 or N/A"
             className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-          />
-        </div>
-
-        {/* Short Description */}
-        <div>
-          <label htmlFor="shortDescription" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Short Description *
-          </label>
-          <textarea
-            id="shortDescription"
-            name="shortDescription"
-            value={formData.shortDescription}
-            onChange={handleInputChange}
-            required
-            rows={2}
-            placeholder="Brief description shown on product card..."
-            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
-          />
-        </div>
-
-        {/* Full Description */}
-        <div>
-          <label htmlFor="fullDescription" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            Full Description *
-          </label>
-          <textarea
-            id="fullDescription"
-            name="fullDescription"
-            value={formData.fullDescription}
-            onChange={handleInputChange}
-            required
-            rows={8}
-            placeholder="Complete detailed description with paragraphs, bullet points, etc..."
-            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
           />
         </div>
 

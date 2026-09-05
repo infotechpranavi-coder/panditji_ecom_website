@@ -7,8 +7,12 @@ interface Category {
   id: string
   _id?: string
   name: string
+  nameHi?: string
+  nameMr?: string
   slug: string
   description: string
+  descriptionHi?: string
+  descriptionMr?: string
   showOnNavbar?: boolean
   isService: boolean
   isProduct: boolean
@@ -22,7 +26,11 @@ export function CategoryManager() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
+    nameHi: '',
+    nameMr: '',
     description: '',
+    descriptionHi: '',
+    descriptionMr: '',
     showOnNavbar: false,
     isService: true,
     isProduct: false
@@ -75,7 +83,11 @@ export function CategoryManager() {
         },
         body: JSON.stringify({
           name: formData.name.trim(),
+          nameHi: formData.nameHi.trim(),
+          nameMr: formData.nameMr.trim(),
           description: formData.description.trim(),
+          descriptionHi: formData.descriptionHi.trim(),
+          descriptionMr: formData.descriptionMr.trim(),
           showOnNavbar: formData.showOnNavbar,
           isService: formData.isService,
           isProduct: formData.isProduct,
@@ -96,7 +108,11 @@ export function CategoryManager() {
         setCategories([...categories, normalizedNewCategory])
         setFormData({
           name: '',
+          nameHi: '',
+          nameMr: '',
           description: '',
+          descriptionHi: '',
+          descriptionMr: '',
           showOnNavbar: false,
           isService: true,
           isProduct: false
@@ -125,7 +141,11 @@ export function CategoryManager() {
         },
         body: JSON.stringify({
           name: formData.name.trim(),
+          nameHi: formData.nameHi.trim(),
+          nameMr: formData.nameMr.trim(),
           description: formData.description.trim(),
+          descriptionHi: formData.descriptionHi.trim(),
+          descriptionMr: formData.descriptionMr.trim(),
           showOnNavbar: formData.showOnNavbar,
           isService: formData.isService,
           isProduct: formData.isProduct,
@@ -137,7 +157,11 @@ export function CategoryManager() {
         setEditingId(null)
         setFormData({
           name: '',
+          nameHi: '',
+          nameMr: '',
           description: '',
+          descriptionHi: '',
+          descriptionMr: '',
           showOnNavbar: false,
           isService: true,
           isProduct: false
@@ -179,7 +203,11 @@ export function CategoryManager() {
     setEditingId(category.id)
     setFormData({
       name: category.name || '',
+      nameHi: category.nameHi || '',
+      nameMr: category.nameMr || '',
       description: category.description || '',
+      descriptionHi: category.descriptionHi || '',
+      descriptionMr: category.descriptionMr || '',
       showOnNavbar: category.showOnNavbar === true,
       isService: category.isService !== false,
       isProduct: category.isProduct === true
@@ -192,7 +220,11 @@ export function CategoryManager() {
     setIsAdding(false)
     setFormData({
       name: '',
+      nameHi: '',
+      nameMr: '',
       description: '',
+      descriptionHi: '',
+      descriptionMr: '',
       showOnNavbar: false,
       isService: true,
       isProduct: false
@@ -225,7 +257,11 @@ export function CategoryManager() {
               setEditingId(null)
               setFormData({
                 name: '',
+                nameHi: '',
+                nameMr: '',
                 description: '',
+                descriptionHi: '',
+                descriptionMr: '',
                 showOnNavbar: false,
                 isService: true,
                 isProduct: false
@@ -255,7 +291,7 @@ export function CategoryManager() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Category Name *
+                Category Name (English) *
               </label>
               <input
                 type="text"
@@ -265,9 +301,35 @@ export function CategoryManager() {
                 className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
               />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Category Name (हिन्दी)
+                </label>
+                <input
+                  type="text"
+                  value={formData.nameHi || ''}
+                  onChange={(e) => setFormData({ ...formData, nameHi: e.target.value })}
+                  placeholder="उदा., दैनिक अनुष्ठान"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Category Name (मराठी)
+                </label>
+                <input
+                  type="text"
+                  value={formData.nameMr || ''}
+                  onChange={(e) => setFormData({ ...formData, nameMr: e.target.value })}
+                  placeholder="उदा., दैनिक विधी"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Description (Optional)
+                Description English (Optional)
               </label>
               <textarea
                 value={formData.description || ''}
@@ -276,6 +338,30 @@ export function CategoryManager() {
                 rows={3}
                 className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
               />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Description (हिन्दी)
+                </label>
+                <textarea
+                  value={formData.descriptionHi || ''}
+                  onChange={(e) => setFormData({ ...formData, descriptionHi: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Description (मराठी)
+                </label>
+                <textarea
+                  value={formData.descriptionMr || ''}
+                  onChange={(e) => setFormData({ ...formData, descriptionMr: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-900 p-4 rounded-xl border border-border">
               <div className="flex items-center gap-3">

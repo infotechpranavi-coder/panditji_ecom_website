@@ -18,8 +18,10 @@ import {
     PhoneCall,
     Smartphone
 } from 'lucide-react'
+import { useT } from '@/components/language-provider'
 
 function ContactForm() {
+    const { t } = useT()
     const searchParams = useSearchParams()
     const urlSubject = searchParams.get('subject')
     
@@ -59,7 +61,7 @@ function ContactForm() {
     const contactInfo = [
         {
             icon: <MapPin className="w-8 h-8 text-primary" />,
-            title: "Visit Us",
+            title: t.visitUs,
             details: [
                 "B-10/303, Ramjash CHS, Ramdev park,",
                 "near bhakti Ram mandir,",
@@ -69,7 +71,7 @@ function ContactForm() {
         },
         {
             icon: <PhoneCall className="w-8 h-8 text-primary" />,
-            title: "Call Us",
+            title: t.callUs,
             details: [
                 "+91 70213 24717 (Primary)",
                 "+91 93209 55282",
@@ -108,7 +110,7 @@ function ContactForm() {
                         <span className="text-sm font-bold text-primary tracking-wide">Connect With Divine Grace</span>
                     </div>
                     <h1 className="text-5xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                        Contact Us
+                        {t.contactUs}
                     </h1>
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                         Have questions about our e-puja services? Reach out to us for spiritual guidance and authentic traditional online rituals.
@@ -196,7 +198,7 @@ function ContactForm() {
                                     <div className="w-24 h-24 bg-green-500/20 text-green-600 rounded-full flex items-center justify-center mx-auto scale-110">
                                         <Send className="w-10 h-10 animate-pulse" />
                                     </div>
-                                    <h3 className="text-3xl font-extrabold text-green-600">Message Sent!</h3>
+                                    <h3 className="text-3xl font-extrabold text-green-600">{t.messageSent}</h3>
                                     <p className="text-muted-foreground font-medium">Thank you for reaching out. We'll be in touch soon.</p>
                                     <button
                                         onClick={() => setIsSubmitted(false)}
@@ -209,7 +211,7 @@ function ContactForm() {
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-muted-foreground ml-1">Full Name</label>
+                                            <label className="text-sm font-bold text-muted-foreground ml-1">{t.yourName}</label>
                                             <input
                                                 type="text"
                                                 name="name"
@@ -221,7 +223,7 @@ function ContactForm() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-muted-foreground ml-1">Email Address</label>
+                                            <label className="text-sm font-bold text-muted-foreground ml-1">{t.yourEmail}</label>
                                             <input
                                                 type="email"
                                                 name="email"
@@ -234,7 +236,7 @@ function ContactForm() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-muted-foreground ml-1">Subject</label>
+                                        <label className="text-sm font-bold text-muted-foreground ml-1">{t.subject}</label>
                                         <input
                                             type="text"
                                             name="subject"
@@ -246,7 +248,7 @@ function ContactForm() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-muted-foreground ml-1">Your Message</label>
+                                        <label className="text-sm font-bold text-muted-foreground ml-1">{t.message}</label>
                                         <textarea
                                             name="message"
                                             value={formData.message}
@@ -267,7 +269,7 @@ function ContactForm() {
                                             <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
                                         ) : (
                                             <>
-                                                <span>Send Message</span>
+                                                <span>{t.sendMessage}</span>
                                                 <Send className="w-5 h-5" />
                                             </>
                                         )}

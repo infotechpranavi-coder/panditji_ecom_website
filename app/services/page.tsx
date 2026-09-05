@@ -6,10 +6,15 @@ import { Search, ArrowRight, Sparkles } from 'lucide-react'
 import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useT } from '@/components/language-provider'
+import { localizeField, localizePuja, localizeCategory } from '@/lib/i18n/localize'
+import { useLocalizedContent, useAutoText, TranslatedText } from '@/components/translated-text'
 
 interface Category {
     _id: string
     name: string
+    nameHi?: string
+    nameMr?: string
     slug: string
     isService?: boolean
     isProduct?: boolean
@@ -19,18 +24,107 @@ interface Puja {
     _id: string
     id?: string
     name: string
+    nameHi?: string
+    nameMr?: string
     category: string
     categorySlug?: string
     image: string
     shortDescription?: string
+    shortDescriptionHi?: string
+    shortDescriptionMr?: string
     description: string
     fullDescription?: string
+    fullDescriptionHi?: string
+    fullDescriptionMr?: string
     price?: number
     discount?: number
     features?: string[]
 }
 
+function CategoryChip({
+    cat,
+    selected,
+    onSelect,
+    compact = false,
+}: {
+    cat: Category
+    selected: boolean
+    onSelect: () => void
+    compact?: boolean
+}) {
+    const name = useLocalizedContent(cat as any, 'name')
+    return (
+        <button
+            onClick={onSelect}
+            className={
+                compact
+                    ? `px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all text-xs uppercase tracking-widest ${
+                          selected
+                              ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
+                      }`
+                    : `px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all text-sm ${
+                          selected
+                              ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
+                      }`
+            }
+        >
+            {name}
+        </button>
+    )
+}
+
+function ServiceCard({ service }: { service: Puja }) {
+    const { t } = useT()
+    const name = useLocalizedContent(service as any, 'name')
+    const short = useLocalizedContent(service as any, 'shortDescription')
+    const desc = useLocalizedContent(service as any, 'description')
+
+    return (
+        <Link
+            href={`/puja/${service.id}`}
+            className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-300 relative"
+        >
+            {service.discount && (
+                <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
+                    -{service.discount}%
+                </div>
+            )}
+            <div className="relative h-48 bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden">
+                {service.image && service.image !== '/placeholder.jpg' ? (
+                    <img
+                        src={service.image}
+                        alt={name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                ) : (
+                    <>
+                        <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                    </>
+                )}
+            </div>
+            <div className="p-6 bg-white dark:bg-card">
+                <h3 className="font-black text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1">
+                    {name}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6 line-clamp-2 font-medium">
+                    {short || desc || 'Authentic traditional rituals performed with devotion and Vedic accuracy.'}
+                </p>
+                <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                    <span className="text-xs font-black text-accent uppercase tracking-widest">{t.viewDetails}</span>
+                    <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
+                        <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
+                    </div>
+                </div>
+            </div>
+        </Link>
+    )
+}
+
 function ServicesContent() {
+    const { t, locale } = useT()
     const searchParams = useSearchParams()
     const initialCategory = searchParams.get('category') || 'all'
     const initialSearch = searchParams.get('search') || ''
@@ -114,13 +208,19 @@ function ServicesContent() {
             
             // Strict matching: only matching against name or category for standard search
             const matchesSearch = !searchText || 
+                localizeField(puja as any, 'name', locale).toLowerCase().includes(searchText) ||
                 puja.name.toLowerCase().includes(searchText) || 
+                (puja.nameHi || '').toLowerCase().includes(searchText) ||
+                (puja.nameMr || '').toLowerCase().includes(searchText) ||
                 puja.category.toLowerCase().includes(searchText)
             
             // Comprehensive blob reserved just for deeper environmental filters (City / Lang)
             const searchBlob = [
                 puja.name,
+                puja.nameHi || '',
+                puja.nameMr || '',
                 puja.category,
+                localizeField(puja as any, 'shortDescription', locale),
                 puja.shortDescription || '',
                 puja.description || '',
                 puja.fullDescription || '',
@@ -132,7 +232,7 @@ function ServicesContent() {
             
             return matchesCategory && matchesSearch && matchesCity && matchesLang
         })
-    }, [pujas, selectedCategory, searchQuery, searchParams])
+    }, [pujas, selectedCategory, searchQuery, searchParams, locale])
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
@@ -207,19 +307,15 @@ function ServicesContent() {
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
                                 }`}
                         >
-                            All Rituals
+                            {t.allRituals}
                         </button>
                         {categories.map((cat) => (
-                            <button
+                            <CategoryChip
                                 key={cat._id}
-                                onClick={() => setSelectedCategory(cat.slug)}
-                                className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all text-sm ${selectedCategory === cat.slug
-                                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
-                                    }`}
-                            >
-                                {cat.name}
-                            </button>
+                                cat={cat}
+                                selected={selectedCategory === cat.slug}
+                                onSelect={() => setSelectedCategory(cat.slug)}
+                            />
                         ))}
                     </div>
                 </div>
@@ -238,19 +334,16 @@ function ServicesContent() {
                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
                                         }`}
                                 >
-                                    All
+                                    {t.allCategories}
                                 </button>
                                 {categories.map((cat) => (
-                                    <button
+                                    <CategoryChip
                                         key={cat._id}
-                                        onClick={() => setSelectedCategory(cat.slug)}
-                                        className={`px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all text-xs uppercase tracking-widest ${selectedCategory === cat.slug
-                                            ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
-                                            }`}
-                                    >
-                                        {cat.name}
-                                    </button>
+                                        cat={cat}
+                                        selected={selectedCategory === cat.slug}
+                                        onSelect={() => setSelectedCategory(cat.slug)}
+                                        compact
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -260,7 +353,7 @@ function ServicesContent() {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="Search on this page..."
+                                    placeholder={t.searchPlaceholder}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-2 border-transparent focus:border-primary rounded-xl transition-all outline-none text-sm font-bold"
@@ -283,45 +376,7 @@ function ServicesContent() {
                     ) : filteredPujas.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {filteredPujas.map((service) => (
-                                <Link
-                                    key={service.id}
-                                    href={`/puja/${service.id}`}
-                                    className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-300 relative"
-                                >
-                                    {service.discount && (
-                                        <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
-                                            -{service.discount}%
-                                        </div>
-                                    )}
-                                    <div className="relative h-48 bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden">
-                                        {service.image && service.image !== '/placeholder.jpg' ? (
-                                            <img
-                                                src={service.image}
-                                                alt={service.name}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                            />
-                                        ) : (
-                                            <>
-                                                <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
-                                                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                                            </>
-                                        )}
-                                    </div>
-                                    <div className="p-6 bg-white dark:bg-card">
-                                        <h3 className="font-black text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1">
-                                            {service.name}
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground mb-6 line-clamp-2 font-medium">
-                                            {service.shortDescription || service.description || 'Authentic traditional rituals performed with devotion and Vedic accuracy.'}
-                                        </p>
-                                        <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                                            <span className="text-xs font-black text-accent uppercase tracking-widest">View Details</span>
-                                            <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
-                                                <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
+                                <ServiceCard key={service.id} service={service} />
                             ))}
                         </div>
                     ) : (
@@ -329,15 +384,15 @@ function ServicesContent() {
                             <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full items-center justify-center flex mx-auto mb-6">
                                 <Search className="w-10 h-10 text-slate-400" />
                             </div>
-                            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">No Results Found</h3>
+                            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t.noResults}</h3>
                             <p className="text-slate-500 max-w-sm mx-auto mb-8 font-medium">
-                                We couldn't find any services matching your current selection.
+                                <TranslatedText text="We couldn't find any services matching your current selection." />
                             </p>
                             <button
                                 onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
                                 className="px-8 py-3 bg-primary text-white rounded-xl font-black shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
                             >
-                                Reset Filters
+                                <TranslatedText text="Reset Filters" />
                             </button>
                         </div>
                     )}

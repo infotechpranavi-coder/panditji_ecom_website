@@ -1,9 +1,13 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Phone, Smartphone, Mail } from 'lucide-react'
+import { MapPin, Phone, Mail } from 'lucide-react'
+import { useT } from '@/components/language-provider'
 
 export function Footer() {
-  // City-wise pandit listings organized by language
+  const { t } = useT()
+
   const cities = [
     {
       name: 'Mumbai',
@@ -83,7 +87,6 @@ export function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Top Section - Contact Info */}
         <div className="py-12 border-b border-white/20">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -98,32 +101,32 @@ export function Footer() {
                 </div>
               </div>
               <p className="text-sm opacity-95 leading-relaxed">
-                Bringing authentic Online Puja services to your home with devotion and grace (Panditji Seva)
+                {t.footerTagline}
               </p>
             </div>
 
             <div>
-              <h4 className="font-bold text-lg mb-4">Main Links</h4>
+              <h4 className="font-bold text-lg mb-4">{t.mainLinks}</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="/services" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Temple Services</a></li>
-                <li><a href="/hindu-calendar" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Hindu Calendar</a></li>
-                <li><a href="/about" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">About Us</a></li>
-                <li><a href="/contact" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Contact Us</a></li>
+                <li><Link href="/services" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.templeServices}</Link></li>
+                <li><Link href="/hindu-calendar" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.hinduCalendar}</Link></li>
+                <li><Link href="/about" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.aboutUs}</Link></li>
+                <li><Link href="/contact" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.contactUs}</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold text-lg mb-4">Policy Info</h4>
+              <h4 className="font-bold text-lg mb-4">{t.policyInfo}</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">How we work</a></li>
-                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Privacy Policy</a></li>
-                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">Terms of Use</a></li>
-                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">FAQ</a></li>
+                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.howWeWork}</a></li>
+                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.privacyPolicy}</a></li>
+                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.termsOfUse}</a></li>
+                <li><a href="#" className="opacity-90 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block">{t.faq}</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold text-lg mb-4">Contact Info</h4>
+              <h4 className="font-bold text-lg mb-4">{t.contactInfo}</h4>
               <ul className="space-y-3 text-sm">
                 <li className="flex gap-2 items-start">
                   <Mail className="w-4 h-4 mt-0.5 opacity-70 flex-shrink-0" />
@@ -148,9 +151,8 @@ export function Footer() {
           </div>
         </div>
 
-        {/* City-wise Pandit Listings */}
         <div className="py-12 border-b border-white/20">
-          <h3 className="font-bold text-xl mb-8 text-center">Find Pandits by City & Language</h3>
+          <h3 className="font-bold text-xl mb-8 text-center">{t.findPanditsByCity}</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8">
             {cities.map((city) => (
               <div key={city.name}>
@@ -158,12 +160,12 @@ export function Footer() {
                 <ul className="space-y-1.5 text-xs">
                   {city.pandits.map((pandit, idx) => (
                     <li key={idx}>
-                      <a
+                      <Link
                         href="/contact"
                         className="opacity-85 hover:opacity-100 hover:text-white transition-all hover:translate-x-1 inline-block"
                       >
                         {pandit.text}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -173,9 +175,9 @@ export function Footer() {
         </div>
 
         <div className="py-6 text-sm opacity-95 text-center">
-          <p className="font-semibold mb-2">&copy; 2026 Book Panditji Seva. All Rights Reserved.</p>
+          <p className="font-semibold mb-2">&copy; 2026 Book Panditji Seva. {t.allRightsReserved}</p>
           <p className="text-xs opacity-80">
-            Powered by{' '}
+            {t.poweredBy}{' '}
             <a
               href="https://pranaviinfotech.com"
               target="_blank"
