@@ -140,18 +140,14 @@ export function BannerManager() {
 
     const toggleActive = async (banner: Banner) => {
         try {
-            // If we contain logic to only allow ONE active, fetching will handle updating others
-            // But for UI feedback, optimistic update or refetch is needed.
-            // Our backend logic for POST/PATCH sets others to false if this is true.
-
             const response = await fetch(`/api/banners/${banner._id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isActive: true }), // Always set to true (click to activate)
+                body: JSON.stringify({ isActive: !banner.isActive }),
             })
 
             if (response.ok) {
-                toast.success('Banner activated')
+                toast.success(banner.isActive ? 'Banner hidden from slider' : 'Banner added to slider')
                 fetchBanners()
             }
         } catch (error) {
@@ -167,6 +163,9 @@ export function BannerManager() {
                     <Upload className="w-5 h-5 text-primary" />
                     Add Hero Banner
                 </h2>
+                <p className="text-sm text-muted-foreground -mt-4 mb-6">
+                    Upload multiple banners — all marked active will rotate in the homepage hero slider.
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -272,17 +271,19 @@ export function BannerManager() {
                                     </p>
 
                                     <div className="flex items-center justify-between gap-3">
-                                        {!banner.isActive && (
-                                            <button
-                                                onClick={() => toggleActive(banner)}
-                                                className="flex-1 px-3 py-1.5 text-sm bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-lg transition-colors font-medium"
-                                            >
-                                                Set Active
-                                            </button>
-                                        )}
+                                        <button
+                                            onClick={() => toggleActive(banner)}
+                                            className={`flex-1 px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
+                                                banner.isActive
+                                                    ? 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                    : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                                            }`}
+                                        >
+                                            {banner.isActive ? 'Hide from slider' : 'Show in slider'}
+                                        </button>
                                         <button
                                             onClick={() => handleDelete(banner._id)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-auto"
+                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                             title="Delete Banner"
                                         >
                                             <Trash2 className="w-4 h-4" />

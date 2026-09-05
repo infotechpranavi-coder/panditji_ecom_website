@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server'
 import connectToDatabase from '@/lib/mongodb'
 import { Banner } from '@/models/Banner'
@@ -7,14 +6,13 @@ export async function GET(req: NextRequest) {
     try {
         await connectToDatabase()
 
-        // Check if we want only the active one for the homepage
         const { searchParams } = new URL(req.url)
         const activeOnly = searchParams.get('active') === 'true'
 
         if (activeOnly) {
-            // Get the most recently created active banner
-            const banner = await Banner.findOne({ isActive: true }).sort({ createdAt: -1 })
-            return NextResponse.json(banner)
+            // All active banners for homepage slider (oldest first so order is stable)
+            const banners = await Banner.find({ isActive: true }).sort({ createdAt: 1 })
+            return NextResponse.json(banners)
         }
 
         const banners = await Banner.find({}).sort({ createdAt: -1 })
@@ -30,22 +28,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        console.log('API POST /api/banners called');
         await connectToDatabase()
-        console.log('Database connected');
 
         const body = await req.json()
-        console.log('Request body:', body);
 
-        // If setting this as active, deactivate others
-        if (body.isActive) {
-            console.log('Deactivating other banners...');
-            await Banner.updateMany({}, { $set: { isActive: false } })
-        }
-
-        console.log('Creating new banner...');
-        const banner = await Banner.create(body)
-        console.log('Banner created:', banner);
+        // New banners default to active so they appear in the homepage slider
+        const banner = await Banner.create({
+            ...body,
+            isActive: body.isActive !== undefined ? body.isActive : true,
+        })
 
         return NextResponse.json(banner, { status: 201 })
     } catch (error: any) {

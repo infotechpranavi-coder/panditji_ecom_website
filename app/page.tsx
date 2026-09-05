@@ -15,26 +15,36 @@ const chakraBalancing: any[] = []
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [bannerIndex, setBannerIndex] = useState(0)
   const [pujas, setPujas] = useState<any[]>([])
-  const [heroBanner, setHeroBanner] = useState<any>(null)
+  const [heroBanners, setHeroBanners] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchPujas()
-    fetchBanner()
+    fetchBanners()
   }, [])
 
-  const fetchBanner = async () => {
+  // Auto-advance hero banner slider
+  useEffect(() => {
+    if (heroBanners.length <= 1) return
+    const timer = setInterval(() => {
+      setBannerIndex((prev) => (prev + 1) % heroBanners.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [heroBanners.length])
+
+  const fetchBanners = async () => {
     try {
       const response = await fetch('/api/banners?active=true')
       if (response.ok) {
         const data = await response.json()
-        if (data && data._id) {
-          setHeroBanner(data)
-        }
+        const list = Array.isArray(data) ? data.filter((b: any) => b?.imageUrl) : (data?._id && data.imageUrl ? [data] : [])
+        setHeroBanners(list)
+        setBannerIndex(0)
       }
     } catch (error) {
-      console.error('Error fetching banner:', error)
+      console.error('Error fetching banners:', error)
     }
   }
 
@@ -90,59 +100,78 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Hero Section - Conditional Rendering */}
-      {heroBanner ? (
-        // Dynamic Hero Banner — full image fits viewport width (no crop/zoom)
+      {/* Hero Section - Multi-banner slider */}
+      {heroBanners.length > 0 ? (
         <section className="relative w-full overflow-hidden bg-muted/20">
-          <Link href="/services" className="block w-full">
-            <img
-              src={heroBanner.imageUrl}
-              alt={heroBanner.title || 'Hero banner'}
-              className="w-full h-auto block"
-            />
-          </Link>
+          <div className="relative w-full">
+            {heroBanners.map((banner, index) => (
+              <div
+                key={banner._id || index}
+                className={index === bannerIndex ? 'block' : 'hidden'}
+              >
+                <Link href="/services" className="block w-full">
+                  <img
+                    src={banner.imageUrl}
+                    alt={banner.title || `Hero banner ${index + 1}`}
+                    className="w-full h-auto block"
+                  />
+                </Link>
 
-          {(heroBanner.title || heroBanner.description) && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
-                <div className="space-y-6 max-w-4xl mx-auto">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-4 animate-fade-in">
-                    <Sparkles className="w-4 h-4 text-accent" />
-                    <span className="text-sm font-bold text-white">Online Puja & e-Puja Services</span>
+                {(banner.title || banner.description) && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                      <div className="space-y-4 max-w-4xl mx-auto">
+                        {banner.title && (
+                          <h1 className="text-3xl md:text-5xl font-black text-white leading-tight drop-shadow-lg tracking-tight">
+                            {banner.title}
+                          </h1>
+                        )}
+                        {banner.description && (
+                          <p className="text-base md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md">
+                            {banner.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-
-                  {heroBanner.title && (
-                    <h1 className="text-3xl md:text-7xl font-black text-white leading-tight drop-shadow-lg tracking-tight mb-4">
-                      {heroBanner.title}
-                    </h1>
-                  )}
-
-                  {heroBanner.description && (
-                    <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto drop-shadow-md mb-6">
-                      {heroBanner.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                    <Link
-                      href="/services"
-                      className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                    >
-                      <span>Explore Services</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </Link>
-                    <Link
-                      href="tel:+917021324717"
-                      className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/20 hover:scale-105 transition-all duration-300"
-                    >
-                      <Phone className="w-5 h-5" />
-                      <span>Contact Us</span>
-                    </Link>
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
-          )}
+            ))}
+
+            {heroBanners.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous banner"
+                  onClick={() => setBannerIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length)}
+                  className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next banner"
+                  onClick={() => setBannerIndex((prev) => (prev + 1) % heroBanners.length)}
+                  className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+                  {heroBanners.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      aria-label={`Go to banner ${index + 1}`}
+                      onClick={() => setBannerIndex(index)}
+                      className={`h-2.5 rounded-full transition-all ${
+                        index === bannerIndex ? 'w-8 bg-white' : 'w-2.5 bg-white/50 hover:bg-white/80'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </section>
       ) : (
         // Fallback: Original Creative Asymmetric Layout

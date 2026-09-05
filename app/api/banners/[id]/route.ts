@@ -47,11 +47,7 @@ export async function PATCH(
         const { id } = await getParams(params)
         const body = await req.json()
 
-        // If making active, deactivate others
-        if (body.isActive) {
-            await Banner.updateMany({ _id: { $ne: id } }, { isActive: false })
-        }
-
+        // Multiple banners can be active at once (homepage slider)
         const updatedBanner = await Banner.findByIdAndUpdate(id, body, { new: true })
 
         if (!updatedBanner) {
