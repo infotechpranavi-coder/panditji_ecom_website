@@ -2,421 +2,483 @@
 
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { Search, ArrowRight, Sparkles } from 'lucide-react'
-import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
+import { Search, ChevronRight, ChevronDown, Menu, X } from 'lucide-react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useT } from '@/components/language-provider'
-import { localizeField, localizePuja, localizeCategory } from '@/lib/i18n/localize'
-import { useLocalizedContent, useAutoText, TranslatedText } from '@/components/translated-text'
+import { localizeField } from '@/lib/i18n/localize'
+import { useLocalizedContent, TranslatedText } from '@/components/translated-text'
+import { textMatchesSearch, searchScore } from '@/lib/search'
 
 interface Category {
-    _id: string
-    name: string
-    nameHi?: string
-    nameMr?: string
-    slug: string
-    isService?: boolean
-    isProduct?: boolean
+  _id: string
+  name: string
+  nameHi?: string
+  nameMr?: string
+  slug: string
+  isService?: boolean
+  isProduct?: boolean
 }
 
 interface Puja {
-    _id: string
-    id?: string
-    name: string
-    nameHi?: string
-    nameMr?: string
-    category: string
-    categorySlug?: string
-    image: string
-    shortDescription?: string
-    shortDescriptionHi?: string
-    shortDescriptionMr?: string
-    description: string
-    fullDescription?: string
-    fullDescriptionHi?: string
-    fullDescriptionMr?: string
-    price?: number
-    discount?: number
-    features?: string[]
+  _id: string
+  id?: string
+  name: string
+  nameHi?: string
+  nameMr?: string
+  category: string
+  categorySlug?: string
+  image: string
+  shortDescription?: string
+  shortDescriptionHi?: string
+  shortDescriptionMr?: string
+  description: string
+  fullDescription?: string
+  fullDescriptionHi?: string
+  fullDescriptionMr?: string
+  price?: number
+  discount?: number
+  features?: string[]
 }
 
-function CategoryChip({
-    cat,
-    selected,
-    onSelect,
-    compact = false,
+function pujaBelongsToCategory(puja: Puja, cat: Category) {
+  const slugFromName = puja.category?.toLowerCase().replace(/\s+/g, '-')
+  return (
+    puja.categorySlug === cat.slug ||
+    puja.category === cat.name ||
+    slugFromName === cat.slug
+  )
+}
+
+function SidebarPujaLink({ puja, onNavigate }: { puja: Puja; onNavigate?: () => void }) {
+  const name = useLocalizedContent(puja as any, 'name')
+  return (
+    <Link
+      href={`/puja/${puja.id}`}
+      onClick={onNavigate}
+      className="block pl-10 pr-4 py-2.5 text-sm text-foreground/80 hover:text-primary hover:bg-primary/5 border-b border-border/40 transition-colors"
+    >
+      {name}
+    </Link>
+  )
+}
+
+function ExpandableCategory({
+  cat,
+  selected,
+  expanded,
+  pujas,
+  onSelect,
+  onNavigate,
 }: {
-    cat: Category
-    selected: boolean
-    onSelect: () => void
-    compact?: boolean
+  cat: Category
+  selected: boolean
+  expanded: boolean
+  pujas: Puja[]
+  onSelect: () => void
+  onNavigate?: () => void
 }) {
-    const name = useLocalizedContent(cat as any, 'name')
-    return (
-        <button
-            onClick={onSelect}
-            className={
-                compact
-                    ? `px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all text-xs uppercase tracking-widest ${
-                          selected
-                              ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
-                      }`
-                    : `px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all text-sm ${
-                          selected
-                              ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
-                      }`
-            }
-        >
-            {name}
-        </button>
-    )
+  const name = useLocalizedContent(cat as any, 'name')
+
+  return (
+    <div className="border-b border-border/70">
+      <button
+        type="button"
+        onClick={onSelect}
+        className={`w-full flex items-center gap-2 px-4 py-3.5 text-left text-sm font-semibold transition-colors ${
+          selected || expanded
+            ? 'bg-primary text-white'
+            : 'bg-white dark:bg-card text-foreground hover:bg-primary/5'
+        }`}
+      >
+        {expanded ? (
+          <ChevronDown className="w-4 h-4 flex-shrink-0" />
+        ) : (
+          <ChevronRight className={`w-4 h-4 flex-shrink-0 ${selected ? 'text-white' : 'text-muted-foreground'}`} />
+        )}
+        <span className="truncate flex-1">{name}</span>
+        <span className={`text-[10px] font-bold ${selected || expanded ? 'text-white/80' : 'text-muted-foreground'}`}>
+          {pujas.length}
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="bg-muted/20 border-t border-border/40">
+          {pujas.length > 0 ? (
+            pujas.map((puja) => (
+              <SidebarPujaLink key={puja.id} puja={puja} onNavigate={onNavigate} />
+            ))
+          ) : (
+            <p className="pl-10 pr-4 py-3 text-xs text-muted-foreground">
+              <TranslatedText text="No pujas in this category yet." />
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
-function ServiceCard({ service }: { service: Puja }) {
-    const { t } = useT()
-    const name = useLocalizedContent(service as any, 'name')
-    const short = useLocalizedContent(service as any, 'shortDescription')
-    const desc = useLocalizedContent(service as any, 'description')
+function ServiceGridCard({ service }: { service: Puja }) {
+  const name = useLocalizedContent(service as any, 'name')
 
-    return (
-        <Link
-            href={`/puja/${service.id}`}
-            className="group bg-white dark:bg-card rounded-2xl border-2 border-border/50 overflow-hidden card-elevated hover:border-accent/50 hover:shadow-2xl transition-all duration-300 relative"
-        >
-            {service.discount && (
-                <div className="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold z-10 shadow-lg">
-                    -{service.discount}%
-                </div>
-            )}
-            <div className="relative h-48 bg-gradient-to-br from-accent/10 via-primary/10 to-accent/5 flex items-center justify-center overflow-hidden">
-                {service.image && service.image !== '/placeholder.jpg' ? (
-                    <img
-                        src={service.image}
-                        alt={name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                ) : (
-                    <>
-                        <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform duration-300">🙏</div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
-                    </>
-                )}
-            </div>
-            <div className="p-6 bg-white dark:bg-card">
-                <h3 className="font-black text-lg mb-2 text-gray-900 dark:text-primary group-hover:text-accent transition-colors line-clamp-1">
-                    {name}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-6 line-clamp-2 font-medium">
-                    {short || desc || 'Authentic traditional rituals performed with devotion and Vedic accuracy.'}
-                </p>
-                <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                    <span className="text-xs font-black text-accent uppercase tracking-widest">{t.viewDetails}</span>
-                    <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent group-hover:text-white transition-all">
-                        <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
-                    </div>
-                </div>
-            </div>
-        </Link>
-    )
+  return (
+    <Link
+      href={`/puja/${service.id}`}
+      className="group bg-white dark:bg-card border border-border rounded-sm overflow-hidden shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
+    >
+      <div className="relative aspect-square bg-muted/30 overflow-hidden">
+        {service.image && service.image !== '/placeholder.jpg' ? (
+          <img
+            src={service.image}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-5xl opacity-30">🙏</div>
+        )}
+        {service.discount ? (
+          <div className="absolute top-2 right-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded">
+            -{service.discount}%
+          </div>
+        ) : null}
+      </div>
+      <div className="px-3 py-3 text-center border-t border-border/60">
+        <h3 className="text-sm font-bold text-primary group-hover:text-accent transition-colors line-clamp-2 min-h-[2.5rem]">
+          {name}
+        </h3>
+      </div>
+    </Link>
+  )
 }
 
 function ServicesContent() {
-    const { t, locale } = useT()
-    const searchParams = useSearchParams()
-    const initialCategory = searchParams.get('category') || 'all'
-    const initialSearch = searchParams.get('search') || ''
+  const { t, locale } = useT()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialCategory = searchParams.get('category') || 'all'
+  const initialSearch = searchParams.get('search') || ''
 
-    const [pujas, setPujas] = useState<Puja[]>([])
-    const [categories, setCategories] = useState<Category[]>([])
-    const [loading, setLoading] = useState(true)
-    const [selectedCategory, setSelectedCategory] = useState(initialCategory)
-    const [searchQuery, setSearchQuery] = useState(initialSearch)
+  const [pujas, setPujas] = useState<Puja[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
+  const [expandedSlug, setExpandedSlug] = useState<string | null>(
+    initialCategory !== 'all' ? initialCategory : null
+  )
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
-    const heroRef = useRef<HTMLElement>(null)
-    const [showSticky, setShowSticky] = useState(false)
+  useEffect(() => {
+    fetchData()
+  }, [])
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setShowSticky(!entry.isIntersecting)
-            },
-            { threshold: 0 }
+  useEffect(() => {
+    const cat = searchParams.get('category')
+    if (cat) {
+      setSelectedCategory(cat)
+      setExpandedSlug(cat)
+    } else {
+      setSelectedCategory('all')
+    }
+    const q = searchParams.get('search')
+    if (q !== null) setSearchQuery(q)
+  }, [searchParams])
+
+  const fetchData = async () => {
+    try {
+      const [pujasRes, categoriesRes] = await Promise.all([
+        fetch('/api/pujas'),
+        fetch('/api/categories'),
+      ])
+
+      if (pujasRes.ok && categoriesRes.ok) {
+        const pujasData = await pujasRes.json()
+        const categoriesData = await categoriesRes.json()
+
+        setPujas(
+          pujasData.map((p: any) => ({
+            ...p,
+            id: p.id || p._id,
+            categorySlug: p.categorySlug || p.category?.toLowerCase().replace(/\s+/g, '-'),
+          }))
         )
 
-        if (heroRef.current) {
-            observer.observe(heroRef.current)
-        }
+        setCategories(
+          categoriesData.filter((cat: any) => cat.isService === true && cat.isProduct !== true)
+        )
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-        return () => {
-            if (heroRef.current) {
-                observer.unobserve(heroRef.current)
-            }
-        }
-    }, [])
+  const pujasByCategory = useMemo(() => {
+    const map: Record<string, Puja[]> = {}
+    categories.forEach((cat) => {
+      map[cat.slug] = pujas.filter((p) => pujaBelongsToCategory(p, cat))
+    })
+    return map
+  }, [categories, pujas])
 
-    useEffect(() => {
-        fetchData()
-    }, [])
+  const selectCategory = (slug: string) => {
+    setSelectedCategory(slug)
+    setExpandedSlug(slug === 'all' ? null : slug)
+    setMobileSidebarOpen(false)
+    const params = new URLSearchParams(searchParams.toString())
+    if (slug === 'all') params.delete('category')
+    else params.set('category', slug)
+    const qs = params.toString()
+    router.push(qs ? `/services?${qs}` : '/services', { scroll: false })
+  }
 
-    useEffect(() => {
-        const cat = searchParams.get('category')
-        if (cat) setSelectedCategory(cat)
-        const q = searchParams.get('search')
-        if (q !== null) setSearchQuery(q)
-    }, [searchParams])
-
-    const fetchData = async () => {
-        try {
-            const [pujasRes, categoriesRes] = await Promise.all([
-                fetch('/api/pujas'),
-                fetch('/api/categories')
-            ])
-
-            if (pujasRes.ok && categoriesRes.ok) {
-                const pujasData = await pujasRes.json()
-                const categoriesData = await categoriesRes.json()
-
-                setPujas(pujasData.map((p: any) => ({ 
-                    ...p, 
-                    id: p.id || p._id,
-                    categorySlug: p.categorySlug || p.category.toLowerCase().replace(/\s+/g, '-')
-                })))
-                
-                // Only show categories that are NOT primarily products
-                setCategories(categoriesData.filter((cat: any) => cat.isService === true && cat.isProduct !== true))
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error)
-        } finally {
-            setLoading(false)
-        }
+  const toggleExpand = (slug: string) => {
+    // Already open → just collapse (do not touch URL, or useEffect will re-open it)
+    if (expandedSlug === slug) {
+      setExpandedSlug(null)
+      return
     }
 
-    const filteredPujas = useMemo(() => {
-        const urlCity = searchParams.get('city')?.toLowerCase() || ''
-        const urlLang = searchParams.get('lang')?.toLowerCase() || ''
+    // Open this category and show its pujas in the grid
+    setSelectedCategory(slug)
+    setExpandedSlug(slug)
+    setMobileSidebarOpen(false)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('category', slug)
+    router.push(`/services?${params.toString()}`, { scroll: false })
+  }
 
-        return pujas.filter(puja => {
-            const matchesCategory = selectedCategory === 'all' ||
-                puja.categorySlug === selectedCategory ||
-                puja.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory
-            
-            const searchText = searchQuery.toLowerCase()
-            
-            // Strict matching: only matching against name or category for standard search
-            const matchesSearch = !searchText || 
-                localizeField(puja as any, 'name', locale).toLowerCase().includes(searchText) ||
-                puja.name.toLowerCase().includes(searchText) || 
-                (puja.nameHi || '').toLowerCase().includes(searchText) ||
-                (puja.nameMr || '').toLowerCase().includes(searchText) ||
-                puja.category.toLowerCase().includes(searchText)
-            
-            // Comprehensive blob reserved just for deeper environmental filters (City / Lang)
-            const searchBlob = [
-                puja.name,
-                puja.nameHi || '',
-                puja.nameMr || '',
-                puja.category,
-                localizeField(puja as any, 'shortDescription', locale),
-                puja.shortDescription || '',
-                puja.description || '',
-                puja.fullDescription || '',
-                (puja.features || []).join(' ')
-            ].join(' ').toLowerCase()
+  const selectedCategoryName = useMemo(() => {
+    if (selectedCategory === 'all') return t.allRituals
+    const cat = categories.find((c) => c.slug === selectedCategory)
+    if (!cat) return t.allRituals
+    return localizeField(cat as any, 'name', locale) || cat.name
+  }, [selectedCategory, categories, locale, t.allRituals])
 
-            const matchesCity = !urlCity || searchBlob.includes(urlCity)
-            const matchesLang = !urlLang || searchBlob.includes(urlLang)
-            
-            return matchesCategory && matchesSearch && matchesCity && matchesLang
-        })
-    }, [pujas, selectedCategory, searchQuery, searchParams, locale])
+  const filteredPujas = useMemo(() => {
+    const urlCity = searchParams.get('city')?.toLowerCase() || ''
+    const urlLang = searchParams.get('lang')?.toLowerCase() || ''
+    const q = searchQuery.trim()
 
-    return (
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-            <Navbar />
+    const matched = pujas.filter((puja) => {
+      let matchesCat = selectedCategory === 'all'
+      if (!matchesCat) {
+        const cat = categories.find((c) => c.slug === selectedCategory)
+        matchesCat = cat
+          ? pujaBelongsToCategory(puja, cat)
+          : puja.categorySlug === selectedCategory ||
+            puja.category?.toLowerCase().replace(/\s+/g, '-') === selectedCategory
+      }
 
-            {/* Hero Section */}
-            <section ref={heroRef} id="hero-section" className="bg-white dark:bg-slate-900 border-b border-border py-12 px-4 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,100,0,0.05),transparent_50%)]" />
-                <div className="mx-auto max-w-7xl relative z-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="max-w-2xl text-center md:text-left">
-                            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20">
-                                <Sparkles className="w-4 h-4 text-primary" />
-                                <span className="text-xs font-bold text-primary uppercase tracking-widest">Divine Services</span>
-                            </div>
-                            <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
-                                Traditional <span className="text-primary italic">Sacred Rituals</span>
-                            </h1>
-                            <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed max-w-xl">
-                                Experience sacred rituals performed with authentic Vedic traditions by certified priests.
-                            </p>
-                        </div>
+      const matchesSearch = textMatchesSearch(
+        q,
+        puja.name,
+        puja.nameHi,
+        puja.nameMr,
+        puja.shortDescription,
+        puja.shortDescriptionHi,
+        puja.shortDescriptionMr,
+        puja.description,
+        puja.fullDescription,
+        puja.fullDescriptionHi,
+        puja.fullDescriptionMr,
+        puja.category
+      )
 
-                        <div className="w-full md:w-[450px] mt-6 md:mt-0">
-                            <div className="relative group">
-                                <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
-                                <div className="relative flex items-center bg-white dark:bg-slate-800 border-2 border-border/50 rounded-2xl overflow-hidden shadow-lg group-focus-within:border-primary transition-all">
-                                    <div className="pl-5 text-slate-400 group-focus-within:text-primary transition-colors">
-                                        <Search className="w-5 h-5" />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        placeholder="Find Pujas, Vrats or Homas..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full px-4 py-4 bg-transparent outline-none font-bold text-slate-700 dark:text-white placeholder:text-slate-400"
-                                    />
-                                    <div className="pr-2">
-                                        <button className="px-6 py-2 bg-primary text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                                            Search
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-3 flex items-center gap-3 px-2">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Popular:</span>
-                                <div className="flex gap-2">
-                                    {['Ganesh Puja', 'Satyanarayan', 'Homa'].map(tag => (
-                                        <button
-                                            key={tag}
-                                            onClick={() => setSearchQuery(tag)}
-                                            className="text-[10px] font-bold text-primary hover:underline"
-                                        >
-                                            {tag}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+      const searchBlob = [
+        puja.name,
+        puja.nameHi || '',
+        puja.nameMr || '',
+        puja.category,
+        puja.shortDescription || '',
+        puja.description || '',
+        puja.fullDescription || '',
+        (puja.features || []).join(' '),
+      ]
+        .join(' ')
+        .toLowerCase()
 
-            {/* Default Category Bar */}
-            {!showSticky && (
-                <div className="bg-white dark:bg-slate-900 border-b border-border">
-                    <div className="mx-auto max-w-7xl px-4 py-4 flex gap-3 overflow-x-auto scrollbar-hide">
-                        <button
-                            onClick={() => setSelectedCategory('all')}
-                            className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all text-sm ${selectedCategory === 'all'
-                                ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
-                                }`}
-                        >
-                            {t.allRituals}
-                        </button>
-                        {categories.map((cat) => (
-                            <CategoryChip
-                                key={cat._id}
-                                cat={cat}
-                                selected={selectedCategory === cat.slug}
-                                onSelect={() => setSelectedCategory(cat.slug)}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
+      const matchesCity = !urlCity || searchBlob.includes(urlCity)
+      const matchesLang = !urlLang || searchBlob.includes(urlLang)
 
-            {/* Sticky Navigation Bar */}
-            <div className={`bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-border sticky top-[168px] z-40 shadow-sm transition-all duration-500 transform ${showSticky ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0 pointer-events-none'}`}>
-                <div className="mx-auto max-w-7xl px-4 py-3">
-                    <div className="flex flex-col lg:flex-row items-center gap-4">
-                        <div className="flex-1 overflow-x-auto scrollbar-hide w-full">
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setSelectedCategory('all')}
-                                    className={`px-5 py-2 rounded-xl font-bold whitespace-nowrap transition-all text-xs uppercase tracking-widest ${selectedCategory === 'all'
-                                        ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary border border-transparent'
-                                        }`}
-                                >
-                                    {t.allCategories}
-                                </button>
-                                {categories.map((cat) => (
-                                    <CategoryChip
-                                        key={cat._id}
-                                        cat={cat}
-                                        selected={selectedCategory === cat.slug}
-                                        onSelect={() => setSelectedCategory(cat.slug)}
-                                        compact
-                                    />
-                                ))}
-                            </div>
-                        </div>
+      return matchesCat && matchesSearch && matchesCity && matchesLang
+    })
 
-                        <div className="w-full lg:w-72">
-                            <div className="relative group">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                                <input
-                                    type="text"
-                                    placeholder={t.searchPlaceholder}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-2 border-transparent focus:border-primary rounded-xl transition-all outline-none text-sm font-bold"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    if (!q) return matched
+
+    // Rank better / closer matches first (Google-like)
+    return [...matched].sort((a, b) => {
+      const scoreA = searchScore(
+        q,
+        a.name,
+        a.nameHi,
+        a.nameMr,
+        a.shortDescription,
+        a.category
+      )
+      const scoreB = searchScore(
+        q,
+        b.name,
+        b.nameHi,
+        b.nameMr,
+        b.shortDescription,
+        b.category
+      )
+      return scoreB - scoreA
+    })
+  }, [pujas, selectedCategory, searchQuery, searchParams, categories])
+
+  const closeMobile = () => setMobileSidebarOpen(false)
+
+  const sidebar = (
+    <aside className="bg-white dark:bg-card border border-border overflow-hidden shadow-sm">
+      <div className="px-4 py-4 border-b border-border bg-muted/30">
+        <h2 className="text-lg font-black text-foreground tracking-tight">
+          <TranslatedText text="Puja Services" />
+        </h2>
+      </div>
+      <nav className="max-h-[75vh] overflow-y-auto">
+        <button
+          type="button"
+          onClick={() => selectCategory('all')}
+          className={`w-full flex items-center gap-2 px-4 py-3.5 text-left text-sm font-semibold border-b border-border/70 transition-colors ${
+            selectedCategory === 'all'
+              ? 'bg-primary text-white'
+              : 'bg-white dark:bg-card text-foreground hover:bg-primary/5'
+          }`}
+        >
+          <ChevronRight className={`w-4 h-4 flex-shrink-0 ${selectedCategory === 'all' ? 'text-white' : 'text-muted-foreground'}`} />
+          <span className="truncate">{t.allRituals}</span>
+        </button>
+
+        {categories.map((cat) => (
+          <ExpandableCategory
+            key={cat._id}
+            cat={cat}
+            selected={selectedCategory === cat.slug}
+            expanded={expandedSlug === cat.slug}
+            pujas={pujasByCategory[cat.slug] || []}
+            onSelect={() => toggleExpand(cat.slug)}
+            onNavigate={closeMobile}
+          />
+        ))}
+      </nav>
+    </aside>
+  )
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#f7f5f2] dark:bg-slate-950">
+      <Navbar />
+
+      <main className="flex-1 px-4 py-8 md:py-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="lg:hidden mb-4 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen((v) => !v)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-card border border-border font-bold text-sm shadow-sm"
+            >
+              {mobileSidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              <TranslatedText text="Categories" />
+            </button>
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t.searchPlaceholder}
+                className="w-full pl-9 pr-3 py-2.5 bg-white dark:bg-card border border-border text-sm font-medium outline-none focus:border-primary"
+              />
             </div>
+          </div>
 
-            {/* Main Grid Section */}
-            <main className="flex-1 px-4 py-16">
-                <div className="mx-auto max-w-7xl">
-                    {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                                <div key={i} className="h-80 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
-                            ))}
-                        </div>
-                    ) : filteredPujas.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {filteredPujas.map((service) => (
-                                <ServiceCard key={service.id} service={service} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-border p-20 text-center">
-                            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full items-center justify-center flex mx-auto mb-6">
-                                <Search className="w-10 h-10 text-slate-400" />
-                            </div>
-                            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t.noResults}</h3>
-                            <p className="text-slate-500 max-w-sm mx-auto mb-8 font-medium">
-                                <TranslatedText text="We couldn't find any services matching your current selection." />
-                            </p>
-                            <button
-                                onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                                className="px-8 py-3 bg-primary text-white rounded-xl font-black shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
-                            >
-                                <TranslatedText text="Reset Filters" />
-                            </button>
-                        </div>
-                    )}
+          {mobileSidebarOpen && <div className="lg:hidden mb-6">{sidebar}</div>}
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div className="hidden lg:block lg:col-span-3 sticky top-28">{sidebar}</div>
+
+            <div className="lg:col-span-9">
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                    {selectedCategoryName}
+                  </p>
+                  <h1 className="text-2xl md:text-3xl font-black text-foreground">
+                    <TranslatedText text="Select Pooja To Perform" />
+                  </h1>
                 </div>
-            </main>
+                <div className="hidden sm:block relative w-full sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t.searchPlaceholder}
+                    className="w-full pl-9 pr-3 py-2.5 bg-white dark:bg-card border border-border text-sm font-medium outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
 
-            <Footer />
+              {loading ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                    <div key={i} className="aspect-[3/4] bg-white border border-border animate-pulse" />
+                  ))}
+                </div>
+              ) : filteredPujas.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                  {filteredPujas.map((service) => (
+                    <ServiceGridCard key={service.id} service={service} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-card border border-dashed border-border p-12 md:p-16 text-center">
+                  <Search className="w-10 h-10 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <h3 className="text-xl font-black mb-2">{t.noResults}</h3>
+                  <p className="text-muted-foreground mb-6 text-sm">
+                    <TranslatedText text="We couldn't find any services matching your current selection." />
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      selectCategory('all')
+                      setSearchQuery('')
+                    }}
+                    className="px-6 py-2.5 bg-primary text-white font-bold text-sm hover:opacity-90 transition-opacity"
+                  >
+                    <TranslatedText text="Reset Filters" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-    )
+      </main>
+
+      <Footer />
+    </div>
+  )
 }
 
 export default function ServicesPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
-                <Navbar />
-                <div className="flex-1 flex flex-col items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                    <p className="mt-4 text-slate-500 font-bold">Loading divine services...</p>
-                </div>
-                <Footer />
-            </div>
-        }>
-            <ServicesContent />
-        </Suspense>
-    )
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col bg-[#f7f5f2] dark:bg-slate-950">
+          <Navbar />
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+            <p className="mt-4 text-muted-foreground font-bold">Loading...</p>
+          </div>
+          <Footer />
+        </div>
+      }
+    >
+      <ServicesContent />
+    </Suspense>
+  )
 }
