@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Upload, X, Image as ImageIcon, Video } from 'lucide-react'
+import { uploadMedia, MAX_VIDEO_SIZE_MB, MAX_IMAGE_SIZE_MB } from '@/lib/upload'
 
 interface PujaFormData {
   name: string
@@ -79,6 +80,7 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
   const [currentReviewComment, setCurrentReviewComment] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadType, setUploadType] = useState<'image' | 'video' | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
 
   useEffect(() => {
     fetchCategories()
@@ -253,29 +255,18 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // Reset input so re-selecting same file triggers onChange
+    e.target.value = ''
+
     setIsUploading(true)
     setUploadType(type)
+    setUploadProgress(0)
 
     try {
-      // Create form data for our local API upload
-      const uploadFormData = new FormData()
-      uploadFormData.append('file', file)
-      uploadFormData.append('folder', 'panditji')
-      uploadFormData.append('resource_type', type === 'image' ? 'image' : 'video')
-
-      // Upload to our internal API route
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: uploadFormData,
+      const data = await uploadMedia(file, type, {
+        folder: 'panditji',
+        onProgress: (percent) => setUploadProgress(percent),
       })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('Cloudinary upload error:', errorData)
-        throw new Error(errorData.error?.message || `Upload failed with status ${response.status}`)
-      }
-
-      const data = await response.json()
 
       // Update form data with the uploaded URL
       setFormData(prev => ({
@@ -286,19 +277,11 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
       alert(`✅ ${type === 'image' ? 'Image' : 'Video'} uploaded successfully!`)
     } catch (error: any) {
       console.error('Upload error:', error)
-
-      // Provide detailed error message
-      let errorMessage = `Failed to upload ${type}.`
-      if (error.message.includes('Invalid')) {
-        errorMessage += '\n\nPlease create an unsigned upload preset in Cloudinary:\n1. Go to Settings → Upload\n2. Add upload preset\n3. Set signing mode to "Unsigned"\n4. Update .env with preset name'
-      } else {
-        errorMessage += `\n\nError: ${error.message}`
-      }
-
-      alert(`❌ ${errorMessage}`)
+      alert(`❌ ${error.message || `Failed to upload ${type}`}`)
     } finally {
       setIsUploading(false)
       setUploadType(null)
+      setUploadProgress(0)
     }
   }
 
@@ -580,14 +563,19 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
 
         {/* Image Upload */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
             Puja Image
           </label>
+          <p className="text-xs text-muted-foreground mb-2">
+            Formats: JPG, PNG, WebP • Max size: <span className="font-semibold text-foreground">{MAX_IMAGE_SIZE_MB} MB</span>
+          </p>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
               <Upload className="w-5 h-5 text-gray-400" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {isUploading && uploadType === 'image' ? 'Uploading...' : 'Upload Image'}
+                {isUploading && uploadType === 'image'
+                  ? `Uploading (${uploadProgress}%)...`
+                  : 'Upload Image'}
               </span>
               <input
                 type="file"
@@ -615,14 +603,19 @@ export function AddPujaForm({ editingPuja, onCancelEdit }: AddPujaFormProps) {
 
         {/* Video Upload */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
             Puja Video
           </label>
+          <p className="text-xs text-muted-foreground mb-2">
+            Formats: MP4, WebM, MOV • Max size: <span className="font-semibold text-foreground">{MAX_VIDEO_SIZE_MB} MB</span>
+          </p>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
               <Upload className="w-5 h-5 text-gray-400" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {isUploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
+                {isUploading && uploadType === 'video'
+                  ? `Uploading (${uploadProgress}%)...`
+                  : 'Upload Video'}
               </span>
               <input
                 type="file"

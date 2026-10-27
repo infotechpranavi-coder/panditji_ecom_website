@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Upload, Trash2, Image as ImageIcon, Video, Search, X } from 'lucide-react'
+import { uploadMedia, MAX_VIDEO_SIZE_MB, MAX_IMAGE_SIZE_MB } from '@/lib/upload'
 
 interface GalleryItem {
     _id: string
@@ -21,6 +22,7 @@ export function GalleryManager() {
     const [filterCategory, setFilterCategory] = useState('all')
     const [isUploading, setIsUploading] = useState(false)
     const [uploadType, setUploadType] = useState<'image' | 'video' | null>(null)
+    const [uploadProgress, setUploadProgress] = useState(0)
 
     const [formData, setFormData] = useState({
         title: '',
@@ -52,25 +54,19 @@ export function GalleryManager() {
         const file = e.target.files?.[0]
         if (!file) return
 
+        // Reset file input so re-selecting same file triggers change
+        e.target.value = ''
+
         setIsUploading(true)
         setUploadType(type)
+        setUploadProgress(0)
 
         try {
-            const uploadFormData = new FormData()
-            uploadFormData.append('file', file)
-            uploadFormData.append('folder', 'panditji/gallery')
-            uploadFormData.append('resource_type', type === 'image' ? 'image' : 'video')
-
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: uploadFormData,
+            const data = await uploadMedia(file, type, {
+                folder: 'panditji/gallery',
+                onProgress: (percent) => setUploadProgress(percent),
             })
 
-            if (!response.ok) {
-                throw new Error('Upload failed')
-            }
-
-            const data = await response.json()
             setFormData(prev => ({
                 ...prev,
                 mediaUrl: data.secure_url,
@@ -80,10 +76,11 @@ export function GalleryManager() {
             alert(`✅ ${type === 'image' ? 'Image' : 'Video'} uploaded successfully!`)
         } catch (error: any) {
             console.error('Upload error:', error)
-            alert(`❌ Failed to upload ${type}`)
+            alert(`❌ ${error.message || `Failed to upload ${type}`}`)
         } finally {
             setIsUploading(false)
             setUploadType(null)
+            setUploadProgress(0)
         }
     }
 
@@ -215,52 +212,61 @@ export function GalleryManager() {
                         />
                     </div>
 
-                    <div className="flex gap-4">
-                        <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
-                            <Upload className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                                {isUploading && uploadType === 'image' ? 'Uploading...' : 'Upload Image'}
-                            </span>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleFileUpload(e, 'image')}
-                                className="hidden"
-                                disabled={isUploading}
-                            />
-                        </label>
+                    <div>
+                        <div className="flex flex-wrap gap-4 items-center">
+                            <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                                <Upload className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    {isUploading && uploadType === 'image'
+                                        ? `Uploading (${uploadProgress}%)...`
+                                        : `Upload Image (Max ${MAX_IMAGE_SIZE_MB}MB)`}
+                                </span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleFileUpload(e, 'image')}
+                                    className="hidden"
+                                    disabled={isUploading}
+                                />
+                            </label>
 
-                        <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
-                            <Upload className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                                {isUploading && uploadType === 'video' ? 'Uploading...' : 'Upload Video'}
-                            </span>
-                            <input
-                                type="file"
-                                accept="video/*"
-                                onChange={(e) => handleFileUpload(e, 'video')}
-                                className="hidden"
-                                disabled={isUploading}
-                            />
-                        </label>
+                            <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                                <Upload className="w-5 h-5 text-gray-400" />
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    {isUploading && uploadType === 'video'
+                                        ? `Uploading (${uploadProgress}%)...`
+                                        : `Upload Video (Max ${MAX_VIDEO_SIZE_MB}MB)`}
+                                </span>
+                                <input
+                                    type="file"
+                                    accept="video/*"
+                                    onChange={(e) => handleFileUpload(e, 'video')}
+                                    className="hidden"
+                                    disabled={isUploading}
+                                />
+                            </label>
 
-                        {formData.mediaUrl && (
-                            <div className="flex items-center gap-2 px-4 py-3 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg">
-                                {formData.mediaType === 'image' ? (
-                                    <ImageIcon className="w-5 h-5 text-green-500" />
-                                ) : (
-                                    <Video className="w-5 h-5 text-green-500" />
-                                )}
-                                <span className="text-sm text-green-600 dark:text-green-400">Uploaded</span>
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, mediaUrl: '' }))}
-                                    className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded"
-                                >
-                                    <X className="w-4 h-4 text-red-500" />
-                                </button>
-                            </div>
-                        )}
+                            {formData.mediaUrl && (
+                                <div className="flex items-center gap-2 px-4 py-3 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg">
+                                    {formData.mediaType === 'image' ? (
+                                        <ImageIcon className="w-5 h-5 text-green-500" />
+                                    ) : (
+                                        <Video className="w-5 h-5 text-green-500" />
+                                    )}
+                                    <span className="text-sm text-green-600 dark:text-green-400">Uploaded</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, mediaUrl: '' }))}
+                                        className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded"
+                                    >
+                                        <X className="w-4 h-4 text-red-500" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                            Allowed: Images up to {MAX_IMAGE_SIZE_MB} MB (JPG, PNG, WebP) • Videos up to {MAX_VIDEO_SIZE_MB} MB (MP4, WebM)
+                        </p>
                     </div>
 
                     <button
